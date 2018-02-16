@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package whatisthisfor;
+
+message XYZData {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
