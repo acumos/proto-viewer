@@ -3,11 +3,10 @@ import requests
 import random
 from time import sleep
 from acumos_proto_viewer.utils import load_proto
-import os
 import sys
 
-test = load_proto("TestXYZProto")
-test2 = load_proto("ImageProto")
+test = load_proto("probe_testxyz_100_proto")
+test2 = load_proto("probe_testimage_100_proto")
 
 HOST = "localhost:5006" #default
 if len(sys.argv) > 1:
@@ -17,18 +16,18 @@ url = "http://{0}/data".format(HOST)
 
 X = 0
 while True:
-    for i in range(0,5): #fire 5x as much fake XYZ as images
+    for i in range(0, 5): #fire 5x as much fake XYZ as images
         X += 1
         msg = test.XYZData()
         msg.x = X
-        msg.y = random.randint(0,10)
-        msg.z = random.randint(50,100)
+        msg.y = random.randint(0, 10)
+        msg.z = random.randint(50, 100)
         msgb = msg.SerializeToString()
         try:
             r = requests.post(url,
-                          data=msgb,
-                          headers = {"modelid" : "TestXYZProto",
-                                     "messagename" : "XYZData"})
+                              data=msgb,
+                              headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/probe_testxyz/1.0.0/probe_testxyz-1.0.0-proto",
+                                       "Message-Name": "XYZData"})
             print(r.status_code)
             assert(msgb == r.content)
             sleep(0.1)
@@ -43,13 +42,12 @@ while True:
     try:
         r = requests.post(url,
                           data=msg2b,
-                          headers = {"modelid" : "ImageProto",
-                                     "messagename" : "TransformedImagePNG"})
+                          headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/probe_testimage/1.0.0/probe_testimage-1.0.0-proto",
+                                   "Message-Name": "TransformedImagePNG"})
         print(r.status_code)
         assert(msg2b == r.content)
     except requests.exceptions.ConnectionError:
         pass
-
 
     msg3 = test2.TransformedImageJPEG()
     theimage = random.choice(["/tmp/1j.jpg","/tmp/2j.jpg","/tmp/3j.jpg","/tmp/4j.jpg", "/tmp/5j.jpg", "/tmp/6j.jpg"])
@@ -59,12 +57,11 @@ while True:
     try:
         r = requests.post(url,
                           data=msg3b,
-                          headers = {"modelid" : "ImageProto",
-                                     "messagename" : "TransformedImageJPEG"})
+                          headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/probe_testimage/1.0.0/probe_testimage-1.0.0-proto",
+                                   "Message-Name": "TransformedImageJPEG"})
         print(r.status_code)
         assert(msg3b == r.content)
     except requests.exceptions.ConnectionError:
         pass
 
     sleep(.5)
-

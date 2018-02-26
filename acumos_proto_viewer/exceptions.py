@@ -1,0 +1,2 @@
+class ProtoNotReachable(Exception):
+    pass

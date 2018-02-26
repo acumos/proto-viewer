@@ -59,5 +59,8 @@ RUN pip install .
 
 EXPOSE 80
 
+RUN mkdir /tmp/protofiles 
+RUN chmod 777 /tmp/protofiles
+
 #START NGINX, REDIS, AND THE APP
 CMD /etc/init.d/nginx start; redis-server --daemonize yes; run.py

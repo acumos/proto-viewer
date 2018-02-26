@@ -14,16 +14,19 @@ If there is a need for a user to log in and see MORE data than the prior midnigh
 
 For the client side, Bokeh has a notion of a DataSource per session, which holds the data sent from the server to the browser, so we also have to limit the client side data, in case a user is logged in for a very long time. The "streaming limit" for numerical data is 100,000 records, just over a day of data assuming one record per second. The streaming limit for images and raw data is just 1; the user sees it as it goes by, or it is lost (there is currently no replay).
 
+# Filesystem
+This application makes the directory `/tmp/protofiles` and uses that for the proto files. Inside Docker this all gets cleaned up. On your machine if you run this, be sure to clean that after. Note many OSs automatically clean up `/tmp` on reboot.
+
 # Build
 
 ```
-docker build -t YOURREG:18443/acumos_proto_viewer:0.7.1 .
-docker push YOURREG:18443/acumos_proto_viewer:0.7.1
+docker build -t YOURREG:18443/acumos_proto_viewer:1.0.0 .
+docker push YOURREG:18443/acumos_proto_viewer:1.0.0
 ```
 
 # Run
 ```
-docker run -dit -p 80:80 YOURREG:18443/acumos_proto_viewer:0.7.1
+docker run -dit -p 80:80 YOURREG:18443/acumos_proto_viewer:1.0.0
 ```
 
 ## Optional additional env variables

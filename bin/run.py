@@ -1,29 +1,21 @@
 #!/usr/bin/env python3
 import os
-import configparser
 from functools import partial
 import hashlib
 
-from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
-
-from bokeh.application import Application
 from bokeh.server.server import Server
-from bokeh.application.handlers import FunctionHandler, ServerLifecycleHandler
 from bokeh.embed import server_document
 from bokeh.layouts import widgetbox, column, row
 from bokeh.models import ColumnDataSource, Div, Range1d
 from bokeh.plotting import figure
 from bokeh.themes import Theme
-from bokeh.models.widgets import Select, TextInput, CheckboxGroup, PreText, Button
-from bokeh.server.server import BaseServer
-from bokeh.server.tornado import BokehTornado
-from bokeh.server.util import bind_sockets
+from bokeh.models.widgets import Select
 from bokeh.io import curdoc
 from jinja2 import Environment, FileSystemLoader
 
 from acumos_proto_viewer import data, get_module_logger
 from acumos_proto_viewer.utils import list_compiled_proto_names
+from acumos_proto_viewer.exceptions import ProtoNotReachable
 
 from tornado.web import RequestHandler
 
@@ -61,35 +53,37 @@ class IndexHandler(RequestHandler):
 
 class DataHandler(RequestHandler):
     def post(self):
-        model_id = self.request.headers["modelid"]
-        message_name = self.request.headers["messagename"]
-        if (model_id is None or message_name is None):
+        proto_url = self.request.headers["PROTO-URL"] #the weird casing on these were told to me by the model connector team
+        message_name = self.request.headers["Message-Name"]
+        if (proto_url is None or message_name is None):
             self.set_status(400)
             self.write("Error: model_id or message_name header missing.")
         else:
-            data.inject_data(self.request.body, model_id, message_name) #todo: should probably catch failures here
-            self.set_status(200)
-            self.write(self.request.body) #Kazi has asked that due to the way the Acmos "model conector" aka "blueprint orchestrator" works, that I should return the request body that I recieved. OK..
+            try:
+                data.inject_data(self.request.body, proto_url, message_name)
+                self.set_status(200)
+                self.write(self.request.body) #Kazi has asked that due to the way the Acmos "model conector" aka "blueprint orchestrator" works, that I should return the request body that I recieved. OK..
+            except ProtoNotReachable:
+                self.set_status(400)
+                self.write("Error: {0} was not downloadable!".format(proto_url))
         self.finish()
 
 class ImageHandler(RequestHandler):
     def get(self, slug):
-        (model_id,  message_name, field, mime, sind, index) = slug.split("---")
-        self.set_header('Content-Type', 'image/'+mime)
+        (model_id, message_name, field, mime, sind, index) = slug.split("---")
+        self.set_header('Content-Type', 'image/' + mime)
         raw_data_size = data.get_raw_data_source_size(model_id, message_name)
         if raw_data_size > 0:
-            i = min(int(index), raw_data_size-1) #if session was logged in before midnight, raw data set might have reset and the session index is now greater; check for this edge case so we don't blow up
-            source = data.get_raw_data(model_id, message_name, i, i+1)
+            i = min(int(index), raw_data_size - 1) #if session was logged in before midnight, raw data set might have reset and the session index is now greater; check for this edge case so we don't blow up
+            source = data.get_raw_data(model_id, message_name, i, i + 1)
             self.set_status(200)
             self.write(source[0][field])
         else:
             self.set_status(404)
         self.finish()
 
-"""
-Helpers
-"""
-
+#######
+# Helpers
 def _remove_fig(curdoc):
     try:
         curdoc.remove_root(curdoc.get_model_by_name("thefig"))
@@ -111,14 +105,16 @@ def _remove_callback(curdoc):
         except:
             pass
 
-def _get_source_index(session_id, model_id, message_name, field_name = None):
+
+def _get_source_index(session_id, model_id, message_name, field_name=None):
     if field_name is None:
         h = "{0}{1}{2}".format(session_id, model_id, message_name)
     else:
         h = "{0}{1}{2}{3}".format(session_id, model_id, message_name, field_name)
     return hashlib.sha224(h.encode('utf-8')).hexdigest()
 
-def _install_callback_and_cds(sind, model_id, message_name, field_transforms = {}, stream_limit = None):
+
+def _install_callback_and_cds(sind, model_id, message_name, field_transforms={}, stream_limit=None):
     """
     Set up a new CDS, install a callback to update it
     If it already exists do nothing
@@ -127,20 +123,19 @@ def _install_callback_and_cds(sind, model_id, message_name, field_transforms = {
     _remove_callback(d)
 
     if d.get_model_by_name(sind) is None:
-        d.add_root(ColumnDataSource({k : [] for k in data.proto_data_structure[model_id]["messages"][message_name]["properties"].keys()},
-                                    name = sind,
-                                    tags = [0]))
+        d.add_root(ColumnDataSource({k: [] for k in data.proto_data_structure[model_id]["messages"][message_name]["properties"].keys()},
+                                    name=sind,
+                                    tags=[0]))
     f = partial(_bokeh_periodic_update, sind, model_id, message_name, field_transforms, stream_limit)
     global _last_callback
     _last_callback = f
     d.add_periodic_callback(f, CBF)
     _logger.info("Callback {0} added for sind {1}".format(f, sind))
 
-"""
-UPDATE CALLBACKS
-"""
 
-def _bokeh_periodic_update(sind, model_id, message_name, field_transforms = {}, stream_limit = None):
+########
+# UPDATE CALLBACKS
+def _bokeh_periodic_update(sind, model_id, message_name, field_transforms={}, stream_limit=None):
     """
     Callback that gets called periodically *for each session*. That is, each session (user connecting via browser) will register a callback of this for their session
     Here we will update the data source with new points
@@ -157,7 +152,7 @@ def _bokeh_periodic_update(sind, model_id, message_name, field_transforms = {}, 
     index = CDS.tags[0]
     source = data.get_raw_data(model_id, message_name, index, -1)
     if source != []: #might be no data, exit callback immediately if so
-        sinit = {k : [] for k in data.proto_data_structure[model_id]["messages"][message_name]["properties"].keys()}
+        sinit = {k: [] for k in data.proto_data_structure[model_id]["messages"][message_name]["properties"].keys()}
         newdata = sinit
         num_data = 0
         for m in source: #from where we left off to the end
@@ -170,7 +165,8 @@ def _bokeh_periodic_update(sind, model_id, message_name, field_transforms = {}, 
 
         #Warning, don't check newdata = sinit because it's not a deep copy!!!!!11!
         d.get_model_by_name(sind).stream(newdata, stream_limit) #after the data source is updated, some magic happens such that the new data is streamed via web socket to the browser
-        CDS.tags = [index+num_data]
+        CDS.tags = [index + num_data]
+
 
 def proto_change():
     d = curdoc()
@@ -185,11 +181,11 @@ def proto_change():
         message.options = []
         d.get_model_by_name("graphs").options = []
 
+
 def message_change():
     d = curdoc()
     _remove_fig(d)
     _remove_selection(d)
-    model_id = d.get_model_by_name("proto").value
     message_name = d.get_model_by_name("message").value
 
     if message_name != "Please Select":
@@ -198,6 +194,7 @@ def message_change():
         d.get_model_by_name("graphs").value = "Please Select"
     else:
         d.get_model_by_name("graphs").options = []
+
 
 def graphs_change():
     d = curdoc()
@@ -219,22 +216,23 @@ def graphs_change():
     if gv in ["image"]:
         #alter the field options for known non-image fields
         field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in ["apv_recieved_at", "apv_sequence_number", "apv_model_as_string"]]
-        imageselect = Select(title="Image Field", value="Please Select", options = ["Please Select"] + field_options, name="imageselect")
+        imageselect = Select(title="Image Field", value="Please Select", options=["Please Select"] + field_options, name="imageselect")
         mimeselect = Select(title="MIME Type", value="Please Select", options=["Please Select"] + SUPPORTED_MIME_TYPES, name="mimeselect")
         imageselect.on_change('value', lambda attr, old, new: image_selection_change())
         mimeselect.on_change('value', lambda attr, old, new: image_selection_change())
         d.add_root(column(Div(text=""), widgetbox([imageselect, mimeselect]), name="imageselection"))
 
     if gv in ["raw"]:
-        p = figure(plot_width = 500, plot_height = 500, title="", name="thefig")
+        p = figure(plot_width=500, plot_height=500, title="", name="thefig")
         sind = _get_source_index(d.session_context.id, d.get_model_by_name("proto").value, d.get_model_by_name("message").value)
-        _install_callback_and_cds(sind, model_id, message_name, stream_limit = 1)
-        p.text(x = 'apv_sequence_number', y = 0,  text='apv_model_as_string', source=d.get_model_by_name(sind), text_font_size="30pt")
-        p.x_range.follow="end" # don't jam all the data into the graph; "window" it
-        p.x_range.follow_interval=1 # don't jam all the data into the graph; "window" it
-        p.x_range.range_padding=0
+        _install_callback_and_cds(sind, model_id, message_name, stream_limit=1)
+        p.text(x='apv_sequence_number', y=0, text='apv_model_as_string', source=d.get_model_by_name(sind), text_font_size="30pt")
+        p.x_range.follow = "end" # don't jam all the data into the graph; "window" it
+        p.x_range.follow_interval = 1 # don't jam all the data into the graph; "window" it
+        p.x_range.range_padding = 0
 
         d.add_root(p)
+
 
 def image_selection_change():
     d = curdoc()
@@ -245,18 +243,19 @@ def image_selection_change():
     mime = d.get_model_by_name("mimeselect").value
 
     if image_field != "Please Select" and mime != "Please Select":
-        p = figure(plot_width = 500, plot_height = 500, title="", x_range=Range1d(start=0, end=1), y_range=Range1d(start=0, end=1), name="thefig")
-        sind = _get_source_index(d.session_context.id, model_id, message_name, image_field+mime)
+        p = figure(plot_width=500, plot_height=500, title="", x_range=Range1d(start=0, end=1), y_range=Range1d(start=0, end=1), name="thefig")
+        sind = _get_source_index(d.session_context.id, model_id, message_name, image_field + mime)
 
         _install_callback_and_cds(sind, model_id, message_name,
-                                  {image_field : [return_image, {"model_id" : model_id,
-                                                                 "message_name": message_name,
-                                                                 "field" : image_field,
-                                                                 "mime" : mime,
-                                                                 "sind" : sind}]},
-                                  stream_limit = 1)
-        p.image_url(url=image_field,  x=0, y = 1, h=1, w=1, source=d.get_model_by_name(sind))
+                                  {image_field: [return_image, {"model_id": model_id,
+                                                                "message_name": message_name,
+                                                                "field": image_field,
+                                                                "mime": mime,
+                                                                "sind": sind}]},
+                                  stream_limit=1)
+        p.image_url(url=image_field, x=0, y=1, h=1, w=1, source=d.get_model_by_name(sind))
         d.add_root(p)
+
 
 def make_2axis_graph():
     d = curdoc()
@@ -281,15 +280,16 @@ def make_2axis_graph():
 
         if gv == "line":
             p.line(x=x, y=y, color="firebrick", line_width=2, source=d.get_model_by_name(sind))
-            p.x_range.follow="end" # don't jam all the data into the graph; "window" it
+            p.x_range.follow = "end" # don't jam all the data into the graph; "window" it
             p.x_range.follow_interval = 100
-            p.x_range.range_padding=0
+            p.x_range.range_padding = 0
         if gv == "scatter":
             p.cross(x=x, y=y, size=20, color="firebrick", line_width=2, source=d.get_model_by_name(sind))
         if gv == "step":
             p.step(x=x, y=y, color="#FB8072", source=d.get_model_by_name(sind))
 
         d.add_root(p)
+
 
 def modify_doc(doc):
     # Create Input controls

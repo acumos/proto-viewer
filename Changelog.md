@@ -1,13 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/) 
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.7.0] 
-* By request from Kazi, when posting into /data, return the request body back to the caller. 
+## [1.0.0]
+* Move from modelid to protourl, and rename headers per what model connector wants
+* Probe will now download the proto file from the URL
+* Fix some PEP8 violations after installing FLAKE8
 
-## [0.6.0] 
+## [0.7.0]
+* By request from Kazi, when posting into /data, return the request body back to the caller.
+
+## [0.6.0]
 * Switch to Redis so we can start TTLing datasets
 * Add tests
 
@@ -23,7 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Support JPEG, make user select MIME type instead of assuming PNG
 * Rename POST /senddata to POST /data to be "rest-ier"
 
-## [0.2.0] 
+## [0.2.0]
 * Add UPDATE_CALLBACK_FREQUENCY as an env variable
 * Add `apv_model_as_string` to each record
 * Add `apv_sequence_number` to each record

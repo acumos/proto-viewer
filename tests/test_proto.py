@@ -1,16 +1,20 @@
-from acumos_proto_viewer.utils import register_proto, load_proto, _protobuf_to_js
+from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _protobuf_to_js
 from types import ModuleType
-import os
 
-register_proto(os.path.abspath(os.path.dirname(__file__)), "test_paul", "fakemodelid")
-
-def test_register_load():
-    test_pb2 = load_proto("fakemodelid")
-    test_pb2 = load_proto("fakemodelid") #cache hit
+def test_register_load(monkeypatch, monkeyed_requests_get, cleanuptmp):
+    monkeypatch.setattr('requests.get', monkeyed_requests_get)
+    register_proto_from_url("http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
+    test_pb2 = load_proto("fakemodelid_100_proto")
+    test_pb2 = load_proto("fakemodelid_100_proto") #cache hit
     assert isinstance(test_pb2, ModuleType)
+    cleanuptmp()
 
-def test_protobuf_to_js():
-    js = _protobuf_to_js("fakemodelid")
+def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
+    monkeypatch.setattr('requests.get', monkeyed_requests_get)
+    register_proto_from_url("http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
+
+    js = _protobuf_to_js("fakemodelid_100_proto")
+    cleanuptmp()
     assert js == {
        "definitions":{
           "testpaul.Data1":{

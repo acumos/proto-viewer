@@ -1,20 +1,18 @@
-import os
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
-from pip.download import PipSession
 
 setup(
     name='acumos_proto_viewer',
-    version='0.7.1',
+    version='1.0.0',
     packages=find_packages(),
-    author = "Tommy Carpenter",
-    author_email = "",
+    author="Tommy Carpenter",
+    author_email="tommy@research.att.com",
     description="Probe for acumos to display Ms's data",
-    license = "",
-    keywords = "",
-    url = "https://gerrit.acumos.org/r/#/admin/projects/proto-viewer",
+    license="",
+    keywords="",
+    url="https://gerrit.acumos.org/r/#/admin/projects/proto-viewer",
     zip_safe=False,
-    scripts = [
+    install_requires=["requests"],
+    scripts=[
         "bin/fake_data.py",
         "bin/run.py"
     ],
