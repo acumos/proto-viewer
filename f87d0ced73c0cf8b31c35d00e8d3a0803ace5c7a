@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "578c6913_c98cb19a",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 16
+      },
+      "writtenOn": "2018-02-27T15:12:38Z",
+      "side": 1,
+      "message": "why u no private constant name",
+      "revId": "f87d0ced73c0cf8b31c35d00e8d3a0803ace5c7a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "32ae91b0_ecc7025e",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 16
+      },
+      "writtenOn": "2018-02-27T15:12:38Z",
+      "side": 1,
+      "message": "use os.path or pathlib module for joining paths imo",
+      "revId": "f87d0ced73c0cf8b31c35d00e8d3a0803ace5c7a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2ebdb3a3_73edcb26",
+        "filename": "bin/run.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 16
+      },
+      "writtenOn": "2018-02-27T15:12:38Z",
+      "side": 1,
+      "message": "idk if you follow Google\u0027s style, but 3rd party library imports come before app-specific imports",
+      "revId": "f87d0ced73c0cf8b31c35d00e8d3a0803ace5c7a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "21ee5ce6_62318784",
+        "filename": "tests/conftest.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 16
+      },
+      "writtenOn": "2018-02-27T15:12:38Z",
+      "side": 1,
+      "message": "interesting choice of package name",
+      "revId": "f87d0ced73c0cf8b31c35d00e8d3a0803ace5c7a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
