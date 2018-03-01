@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import os
 from functools import partial
-import hashlib
-
 from bokeh.server.server import Server
 from bokeh.embed import server_document
 from bokeh.layouts import widgetbox, column, row
@@ -12,12 +10,12 @@ from bokeh.themes import Theme
 from bokeh.models.widgets import Select
 from bokeh.io import curdoc
 from jinja2 import Environment, FileSystemLoader
+from tornado.web import RequestHandler
 
 from acumos_proto_viewer import data, get_module_logger
 from acumos_proto_viewer.utils import list_compiled_proto_names
-from acumos_proto_viewer.exceptions import ProtoNotReachable
+from acumos_proto_viewer import run_handlers
 
-from tornado.web import RequestHandler
 
 #magic that will be used to return the correct image url even when in Docker; will be set to the request uri to /. If they can hit whatever:/, then they can hit whatever/data etc
 
@@ -30,12 +28,14 @@ _last_callback = None
 
 _logger = get_module_logger(__name__)
 
+
 def return_image(val, model_id, message_name, field, mime, sind):
     CDS = curdoc().get_model_by_name(sind)
     index = CDS.tags[0]
     url = "http://{0}/image/".format(_host) + "---".join([model_id, message_name, field, mime, sind, str(index)])
     #_logger.debug("generated image URL: {0}".format(url))
     return url
+
 
 class IndexHandler(RequestHandler):
     def get(self):
@@ -51,22 +51,14 @@ class IndexHandler(RequestHandler):
         self.write(template.render(script=script, template="Tornado"))
         self.finish()
 
+
 class DataHandler(RequestHandler):
     def post(self):
-        proto_url = self.request.headers["PROTO-URL"] #the weird casing on these were told to me by the model connector team
-        message_name = self.request.headers["Message-Name"]
-        if (proto_url is None or message_name is None):
-            self.set_status(400)
-            self.write("Error: model_id or message_name header missing.")
-        else:
-            try:
-                data.inject_data(self.request.body, proto_url, message_name)
-                self.set_status(200)
-                self.write(self.request.body) #Kazi has asked that due to the way the Acmos "model conector" aka "blueprint orchestrator" works, that I should return the request body that I recieved. OK..
-            except ProtoNotReachable:
-                self.set_status(400)
-                self.write("Error: {0} was not downloadable!".format(proto_url))
+        code, status = run_handlers.handle_data_post(self.request.headers, self.request.body)
+        self.set_status(code)
+        self.write(status)
         self.finish()
+
 
 class ImageHandler(RequestHandler):
     def get(self, slug):
@@ -104,14 +96,6 @@ def _remove_callback(curdoc):
             _logger.info("Callback removed")
         except:
             pass
-
-
-def _get_source_index(session_id, model_id, message_name, field_name=None):
-    if field_name is None:
-        h = "{0}{1}{2}".format(session_id, model_id, message_name)
-    else:
-        h = "{0}{1}{2}{3}".format(session_id, model_id, message_name, field_name)
-    return hashlib.sha224(h.encode('utf-8')).hexdigest()
 
 
 def _install_callback_and_cds(sind, model_id, message_name, field_transforms={}, stream_limit=None):
@@ -224,7 +208,7 @@ def graphs_change():
 
     if gv in ["raw"]:
         p = figure(plot_width=500, plot_height=500, title="", name="thefig")
-        sind = _get_source_index(d.session_context.id, d.get_model_by_name("proto").value, d.get_model_by_name("message").value)
+        sind = run_handlers.get_source_index(d.session_context.id, d.get_model_by_name("proto").value, d.get_model_by_name("message").value)
         _install_callback_and_cds(sind, model_id, message_name, stream_limit=1)
         p.text(x='apv_sequence_number', y=0, text='apv_model_as_string', source=d.get_model_by_name(sind), text_font_size="30pt")
         p.x_range.follow = "end" # don't jam all the data into the graph; "window" it
@@ -244,7 +228,7 @@ def image_selection_change():
 
     if image_field != "Please Select" and mime != "Please Select":
         p = figure(plot_width=500, plot_height=500, title="", x_range=Range1d(start=0, end=1), y_range=Range1d(start=0, end=1), name="thefig")
-        sind = _get_source_index(d.session_context.id, model_id, message_name, image_field + mime)
+        sind = run_handlers.get_source_index(d.session_context.id, model_id, message_name, image_field + mime)
 
         _install_callback_and_cds(sind, model_id, message_name,
                                   {image_field: [return_image, {"model_id": model_id,
@@ -271,8 +255,8 @@ def make_2axis_graph():
         pass
     else:
         p = figure(plot_width=400, plot_height=400, name="thefig")
-        sind = _get_source_index(d.session_context.id, d.get_model_by_name("proto").value, d.get_model_by_name("message").value)
-        _install_callback_and_cds(sind, model_id, message_name, stream_limit = 100000)
+        sind = run_handlers.get_source_index(d.session_context.id, d.get_model_by_name("proto").value, d.get_model_by_name("message").value)
+        _install_callback_and_cds(sind, model_id, message_name, stream_limit=100000)
 
         #get the field name back from the pretty field : meta string formed above
         x = xval.split(" :")[0]

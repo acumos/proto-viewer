@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.0]
+* Allow the POST to contain a partial URL, and implement the ENV variable the model connector will deploy the probe with; contatenating the two forms the full probe URL.
+* Start the breakout of functionality from bin/run to other modules to enable more unit testing
+* Fix more (but not all) pylint violations
+
 ## [1.0.0]
 * Move from modelid to protourl, and rename headers per what model connector wants
 * Probe will now download the proto file from the URL
