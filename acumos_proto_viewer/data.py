@@ -13,7 +13,7 @@ import redis
 
 _logger = get_module_logger(__name__)
 
-proto_data_structure = {} #WARNING, HACKY FOR NOW, LATER SHOULD BE SQLITE OR SOMETHING
+proto_data_structure = {}  # WARNING, HACKY FOR NOW, LATER SHOULD BE SQLITE OR SOMETHING
 
 myredis = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -29,7 +29,8 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
     msg = getattr(mod, message_name)()
     msg.ParseFromString(binarydata)
     r = {}
-    fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys()
+    fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys(
+    )
     for f in fields:
         if f == "apv_recieved_at":
             r[f] = int(time.time())
@@ -62,6 +63,8 @@ def _get_raw_data_source_index(model_id, message_name):
 
 ###########
 # PUBLIC
+
+
 def get_raw_data_source_size(model_id, message_name):
     index = _get_raw_data_source_index(model_id, message_name)
     return myredis.llen(index) if myredis.exists(index) else 0
@@ -75,7 +78,7 @@ def get_raw_data(model_id, message_name, index_start, index_end):
         We always go from the last midngight
     """
     index = _get_raw_data_source_index(model_id, message_name)
-    #you cannot have lists of dicts in myredis, the solution is to serialize them, see https://stackoverflow.com/questions/8664664/list-of-dicts-in-myredis
+    # you cannot have lists of dicts in myredis, the solution is to serialize them, see https://stackoverflow.com/questions/8664664/list-of-dicts-in-myredis
     return [marshal.loads(x) for x in myredis.lrange(index, index_start, index_end)] if myredis.exists(index) else []
 
 
@@ -84,17 +87,21 @@ def inject_data(binarydata, proto_url, message_name):
     Inject data into the appropriate queue
     In the future if the data moves to a database this would go away
     """
-    #register the proto file. Will return immediately if already exists
+    # register the proto file. Will return immediately if already exists
     model_id = register_proto_from_url(proto_url)
 
     size = get_raw_data_source_size(model_id, message_name)
     index = _get_raw_data_source_index(model_id, message_name)
     m = _msg_to_json_preserve_bytes(binarydata, model_id, message_name,
                                     size + 1)
-    if sorted(m.keys()) == sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys()): #safegaurd against malformed data
-        myredis.rpush(index, marshal.dumps(m)) #this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
+    # safegaurd against malformed data
+    if sorted(m.keys()) == sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys()):
+        # this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
+        myredis.rpush(index, marshal.dumps(m))
         if size == 0:
-            _logger.debug("Created new data source and setting a TTL of one day")
-            myredis.expire(index, 60*60*24)
+            _logger.debug(
+                "Created new data source and setting a TTL of one day")
+            myredis.expire(index, 60 * 60 * 24)
     else:
-        _logger.debug("Data dropped! {0} compared to {1}".format(m.keys(), sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys())))
+        _logger.debug("Data dropped! {0} compared to {1}".format(m.keys(), sorted(
+            proto_data_structure[model_id]["messages"][message_name]["properties"].keys())))
