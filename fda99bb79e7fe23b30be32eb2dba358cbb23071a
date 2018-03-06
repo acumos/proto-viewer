@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "73d4c4a4_f81b7dba",
+        "filename": "docs/developersguide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-06T22:06:35Z",
+      "side": 1,
+      "message": "How about changing this to Acumos Protobuf View Developer Guide? and add a line of equal signs above so Sphinx knows it\u0027s the document title",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 19
+      },
+      "revId": "fda99bb79e7fe23b30be32eb2dba358cbb23071a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
