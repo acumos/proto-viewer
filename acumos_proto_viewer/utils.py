@@ -5,7 +5,7 @@ import importlib.util
 import json
 import requests
 from acumos_proto_viewer import get_module_logger
-from acumos_proto_viewer.exceptions import ProtoNotReachable
+from acumos_proto_viewer.exceptions import SchemaNotReachable
 
 _logger = get_module_logger(__name__)
 
@@ -20,7 +20,7 @@ def _gen_compiled_proto_path(model_id):
     return "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
 
 
-def _check_modelid_already_registered(model_id):
+def _check_model_id_already_registered(model_id):
     """
     Checks whether a model_id already exists so we can exit immediately before doing work
     """
@@ -37,7 +37,7 @@ def _compile_proto(model_id):
         TODO: add a flag to force a recompile
     """
     gen_module = _gen_compiled_proto_path(model_id)
-    if _check_modelid_already_registered(model_id):
+    if _check_model_id_already_registered(model_id):
         return gen_module
 
     expected_proto = "{0}/{1}.proto".format(OUTPUT_DIR, model_id)
@@ -73,6 +73,15 @@ def _load_module(module_name, path):
     return module
 
 
+def _inject_apv_keys_into_schema(schema_entrypoint):
+    """
+    Inject the proto viewer keys into a jsonschema
+    """
+    schema_entrypoint["apv_recieved_at"] = {'type': 'integer'}
+    schema_entrypoint["apv_model_as_string"] = {'type': 'string'}
+    schema_entrypoint["apv_sequence_number"] = {'type': 'integer'}
+
+
 def _protobuf_to_js(module_name):
     """
     Converts a protobuf to jsonschema
@@ -84,10 +93,21 @@ def _protobuf_to_js(module_name):
     return json.loads(out)
 
 
+def _register_jsonschema(js_schema, model_id):
+    """
+    Makes a jsonschema known to this viz
+    """
+    from acumos_proto_viewer import data
+    _logger.info("Registering jsonschema %s", model_id)
+    data.jsonschema_data_structure[model_id] = {}
+    _inject_apv_keys_into_schema(js_schema["properties"])
+    data.jsonschema_data_structure[model_id]["json_schema"] = js_schema
+
+
 def _register_proto(proto_name, model_id):
     """
     Makes a proto file "known" to this viz
-    Later this would get done on demand when an unknown message type comes in by quering the catalog with the modelid
+    Later this would get done on demand when an unknown message type comes in by quering the catalog with the model_id
     """
     from acumos_proto_viewer import data
     _logger.info("Registering proto %s", model_id)
@@ -99,29 +119,22 @@ def _register_proto(proto_name, model_id):
     data.proto_data_structure[model_id]["messages"] = {}
 
     for key in list(j_schema["definitions"].keys()):
-        # Inject a field for the timestamp to live. Not sure how I feel about this, but I don't see a better way to timestamp every recieved record right now.
-        j_schema["definitions"][key]["properties"]["apv_recieved_at"] = {
-            'type': 'timestamp'}
-        j_schema["definitions"][key]["properties"]["apv_model_as_string"] = {
-            'type': 'string'}
-        j_schema["definitions"][key]["properties"]["apv_sequence_number"] = {
-            'type': 'int'}
+        _inject_apv_keys_into_schema(j_schema["definitions"][key]["properties"])
         data.proto_data_structure[model_id]["messages"][key.split(
             ".")[1]] = {"properties": j_schema["definitions"][key]["properties"]}
 
 
-def _proto_url_to_modelid(url):
+def _proto_url_to_model_id(url):
     # protoc cannot handle filenames with . in it!. It also renames "-" to "_"
     return url.split("/")[-1].replace(".", "").replace("-", "_")
 
 
-def _wget_proto(url):
+def _wget_proto(url, model_id):
     """
     Used to download the proto files
     """
-    model_id = _proto_url_to_modelid(url)
     fname = model_id + ".proto"
-    if _check_modelid_already_registered(model_id):
+    if _check_model_id_already_registered(model_id):
         return model_id, fname
     else:
         _logger.debug("Attempting to download {0}".format(url))
@@ -135,18 +148,31 @@ def _wget_proto(url):
             return model_id, fname
         else:
             _logger.error("Error: unable to reach {0}".format(url))
-            raise ProtoNotReachable()
+            raise SchemaNotReachable()
 
 
-#######
-# PUBLIC
-def register_proto_from_url(url):
+def _wget_jsonschema(url, model_id):
     """
-    Makes a proto file known to this probe by a URL.
+    Used to download a JSON Schema file
+    """
+    if _check_model_id_already_registered(model_id):
+        return model_id
+    _logger.debug("Attempting to download {0}".format(url))
+    r = requests.get(url)
+    if r.status_code == 200:
+        _logger.debug("{0} succesfully downloaded as {1}".format(url, model_id))
+        return json.loads(r.text)
+    _logger.error("Error: unable to reach {0}".format(url))
+    raise SchemaNotReachable()
+
+
+def _register_schema_from_url(url, schema_type, model_id):
+    """
+    Makes a proto file or jsonschema file known to this probe by a URL.
     The term URL here is overloaded. When the probe runs in certain scenarios, for example when it talks to the Acumos model connector, it is not given a full URl in the POST.
     Instead, in that scenario, it is given a partial URL, and the prefix is given when the probe is deployed as an ENV variable under "NEXUSENDPOINTURL".
     This function handles both cases: when it recieves a full URL, and when it recieves a partial.
-    If it is not given a full URL, AND that NEXUSENDPOINTURL does not exist, this function throws a ProtoNotReachable
+    If it is not given a full URL, AND that NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable
     """
     if url.startswith("http"):
         targeturl = url
@@ -158,17 +184,35 @@ def register_proto_from_url(url):
                 nexus_endpoint = nexus_endpoint + "/"
             targeturl = "{0}{1}".format(nexus_endpoint, url)
         else:
-            raise ProtoNotReachable()
-    modelid, fname = _wget_proto(targeturl)
-    _register_proto(fname, modelid)
-    return modelid
+            raise SchemaNotReachable()
+
+    if schema_type == "proto":
+        fname = _wget_proto(targeturl, model_id)
+        _register_proto(fname, model_id)
+    else:
+        js_schema = _wget_jsonschema(targeturl, model_id)
+        _register_jsonschema(js_schema, model_id)
+    return model_id
 
 
-def list_compiled_proto_names():
+#######
+# PUBLIC
+
+
+def register_proto_from_url(url):
     """
-    Return the list of module names that have been compiled in this instance
+    Register a proto file from a URL
     """
-    return [f[0:-7] for f in listdir(OUTPUT_DIR) if f.endswith("_pb2.py")]
+    model_id = _proto_url_to_model_id(url)
+    return _register_schema_from_url(url, "proto", model_id)
+
+
+def register_jsonschema_from_url(url, topic_name):
+    """
+    Register a jsonschema from a URL
+    Use topic_name as model_id
+    """
+    return _register_schema_from_url(url, "jsonschema", topic_name)
 
 
 def load_proto(model_id, cache={}):
@@ -178,8 +222,7 @@ def load_proto(model_id, cache={}):
     """
     if model_id in cache:
         return cache[model_id]
-    else:
-        expected_path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
-        m = _load_module(model_id, expected_path)
-        cache[model_id] = m
-        return m
+    expected_path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
+    module = _load_module(model_id, expected_path)
+    cache[model_id] = module
+    return module

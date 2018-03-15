@@ -1,2 +1,2 @@
-class ProtoNotReachable(Exception):
+class SchemaNotReachable(Exception):
     pass

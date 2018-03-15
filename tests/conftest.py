@@ -1,7 +1,8 @@
 from requests.exceptions import HTTPError
 import pytest
 import os
-from acumos_proto_viewer.utils import list_compiled_proto_names, load_proto
+from acumos_proto_viewer.utils import load_proto
+from acumos_proto_viewer import data
 
 
 class FakeResponse():
@@ -48,6 +49,21 @@ def monkeyed_requests_get():
         if url == "http://myserver.com/emptyinside":
             return FakeResponse(status_code=404,
                                 text="")
+        if url == "http://myserver.com/probe_testschema/1.0.0/probe_testschema-1.0.0":
+            fake_schema = """
+            {
+                "$schema": "http://json-schema.org/draft-04/schema#",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": ""
+                  }
+                },
+                "required": ["value"],
+                "type": "object"
+              }
+            """
+            return FakeResponse(status_code=200, text=fake_schema)
 
     return mrg
 
@@ -57,7 +73,9 @@ def cleanuptmp():
     def _dt():
         os.remove("/tmp/protofiles/fakemodelid_100_proto.proto")
         os.remove("/tmp/protofiles/fakemodelid_100_proto_pb2.py")
-        assert('fakemodelid_100_proto' not in list_compiled_proto_names())
+        del data.proto_data_structure["fakemodelid_100_proto"]
+        assert('fakemodelid_100_proto' not in data.list_known_protobufs())
+
     return _dt
 
 
