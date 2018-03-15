@@ -1,0 +1,74 @@
+swagger: "2.0"
+info:
+  version: "1.1.0"
+  title: "Acumos Proto Viewer"
+paths:
+  /:
+    get:
+      description: "view the webpage to build a graph"
+      responses:
+        200:
+          description: "webpage root returned"
+  /data:
+    post:
+      description: "send protobuf data to the probe. This is a POST with two headers, PROTO-URL and Message-Name, and a body containing the raw protobuf bytes"
+      parameters:
+        - name: "PROTO-URL"
+          in: "header"
+          description: "Either the full URL to the protobuf specification (.proto), or a partial URL if the probe was launched with the ENV variable NEXUSENDPOINTURL, in which case the URL is formed as the contatenation"
+          required: true
+          type: "string"
+        - name: "Message-Name"
+          in: "header"
+          description: "The message name in the protobuf spec that is being sent in this POST"
+          required: true
+          type: "string"
+        - name: "postbody"
+          in: "body"
+          description: "the raw protobuf bytes. NOTE: 'type: bytes' is not valid swagger, so the below type of string means bytes"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+            description: "OK; data sucessfully submitted to the probe"
+        404:
+          description: "BAD REQUEST; either a missing header, or the PROTO-URL (or concatenation) was not a downloadable file"
+  /onap_topic_subscription/{topicname}:
+    parameters:
+      - name: "topicname"
+        in: "path"
+        description: "The ONAP MR topic name"
+        required: true
+        type: "string"
+    put:
+      description: "have the viewer subscribe to an ONAP message router topic  (kafka underneath)"
+      parameters:
+        - name: "schema-url"
+          in: "header"
+          description: "The full URL to the json schema of the data"
+          required: true
+          type: "string"
+        - name: "server-hostname"
+          in: "header"
+          description: "The ONAP message router server hostname"
+          required: true
+          type: "string"
+        - name: "server-port"
+          in: "header"
+          description: "The ONAP message router server port"
+          required: true
+          type: "integer"
+
+      responses:
+        200:
+          description: "OK; topic sucessfully subscribed to"
+        404:
+          description: "BAD REQUEST; the probe could not subscribe to the ONAP message router topic"
+    delete:
+      description: "remove a subscription from the probe"
+      responses:
+        200:
+          description: "OK; topic subscription sucessfully deleted"
+        404:
+          description: "BAD REQUEST; the probe was not subscribed"

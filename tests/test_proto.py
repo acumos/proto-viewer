@@ -1,12 +1,12 @@
-from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _protobuf_to_js, list_compiled_proto_names
 from types import ModuleType
+from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _protobuf_to_js
+from acumos_proto_viewer import data
 
 
 def test_register_load(monkeypatch, monkeyed_requests_get, cleanuptmp):
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
-    register_proto_from_url(
-        "http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
-    assert('fakemodelid_100_proto' in list_compiled_proto_names())
+    register_proto_from_url("http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
+    assert('fakemodelid_100_proto' in data.list_known_protobufs())
     test_pb2 = load_proto("fakemodelid_100_proto")
     test_pb2 = load_proto("fakemodelid_100_proto")  # cache hit
 
@@ -17,7 +17,7 @@ def test_register_load(monkeypatch, monkeyed_requests_get, cleanuptmp):
 def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
     register_proto_from_url("fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
-    assert('fakemodelid_100_proto' in list_compiled_proto_names())
+    assert('fakemodelid_100_proto' in data.list_known_protobufs())
 
     js = _protobuf_to_js("fakemodelid_100_proto")
     cleanuptmp()
