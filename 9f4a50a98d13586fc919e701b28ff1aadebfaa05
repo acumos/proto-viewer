@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b137c3d_bb53f93c",
+        "filename": "acumos_proto_viewer/run_handlers.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 16
+      },
+      "writtenOn": "2018-03-16T16:44:55Z",
+      "side": 1,
+      "message": "Mutable constant? Why not tuple",
+      "revId": "9f4a50a98d13586fc919e701b28ff1aadebfaa05",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
