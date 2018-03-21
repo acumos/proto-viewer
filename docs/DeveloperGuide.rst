@@ -17,7 +17,7 @@
 .. ===============LICENSE_END=========================================================
 
 ===================
-Acumos Protobuf View Developer Guide
+Proto Viewer Developer Guide
 ===================
 
 Dependencies
