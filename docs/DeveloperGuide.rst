@@ -16,9 +16,9 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-===================
-Acumos Protobuf View Developer Guide
-===================
+============================
+Proto Viewer Developer Guide
+============================
 
 Dependencies
 ============
@@ -27,7 +27,7 @@ If you are running in Docker, there are no external dependencies, it is,
 for better or worse[1], totally self contained.
 
 If you are running locally, you will need to have redis running on the
-standard port, reachable from ``localhost``.
+standard port, reachable from **localhost**.
 
 [1] This Docker container runs Nginx, Redis, and Bokeh..
 
@@ -54,15 +54,15 @@ it goes by, or it is lost (there is currently no replay).
 Filesystem
 ==========
 
-This application makes the directory ``/tmp/protofiles`` and uses that
+This application makes the directory **/tmp/protofiles** and uses that
 for the proto files. Inside Docker this all gets cleaned up. On your
 machine if you run this, be sure to clean that after. Note many OSs
-automatically clean up ``/tmp`` on reboot.
+automatically clean up **/tmp** on reboot.
 
 Build
 =====
 
-::
+.. code:: bash
 
     docker build -t YOURREG:18443/acumos_proto_viewer:1.0.0 .
     docker push YOURREG:18443/acumos_proto_viewer:1.0.0
@@ -70,9 +70,10 @@ Build
 Run
 ===
 
-::
+.. code:: bash
 
     docker run -dit -p 80:80 YOURREG:18443/acumos_proto_viewer:1.0.0
+
 
 Optional additional env variables
 ---------------------------------
@@ -82,28 +83,29 @@ You can also pass in the following to alter the run behavioor:
 1. UPDATE_CALLBACK_FREQUENCY // sets the frequency, in ms (1000=every
    second) of the callbacks that update the graphs on the screen, e.g.,
 
+
 Fake data
 =========
 
 To launch a script that generates fake data and sends it:
 
-::
+.. code:: bash
 
     fake_data.py [host:port]
 
-``[host:port]`` is an optional cmd line argument giving the target proto
-to send data to; it defaults to ``localhost:5006`` for local
+**[host:port]** is an optional cmd line argument giving the target proto
+to send data to; it defaults to **localhost:5006** for local
 development.
 
 Extra Fields
 ============
 
-Every protobuf message that enters the ``/senddata`` endpoint is
+Every protobuf message that enters the **/senddata** endpoint is
 injected, by this server, with additional keys:
 
-1. ``apv_recieved_at`` : the epoch timestamp that the model was recieved
+1. **apv_recieved_at**: the epoch timestamp that the model was recieved
    at. Used for plotting a single variable against time
-2. ``apv_model_as_string`` : the string representation of the entire
+2. **apv_model_as_string**: the string representation of the entire
    model, used for plotting the raw text if the user chooses
-3. ``apv_sequence_number`` : the sequence number of this “type” of raw
+3. **apv_sequence_number**: the sequence number of this “type” of raw
    data, where type = (model_id, message_name)
