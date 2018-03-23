@@ -23,5 +23,5 @@ Proto Viewer
 .. toctree::
    :maxdepth: 2
 
-   DeveloperGuide.rst
    release-notes.rst
+   developer-guide.rst
