@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c68a271_0ec8764e",
+        "filename": "docs/release-notes.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-23T23:41:15Z",
+      "side": 1,
+      "message": "Would you consider including a release date on the versions?",
+      "revId": "5f1a8a481c57052773dcfc4585471f2ddff9a629",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
