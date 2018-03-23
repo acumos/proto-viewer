@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "735a49b5_f9f58ec9",
+        "filename": "docs/index.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 51
+      },
+      "writtenOn": "2018-03-23T21:25:45Z",
+      "side": 1,
+      "message": "change to DeveloperGuide.rst",
+      "revId": "b32106d3a4dc8f4152753ff02ee949c6dbaec4da",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
