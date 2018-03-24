@@ -27,6 +27,11 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic
 Versioning <http://semver.org/>`__.
 
+[1.3.0]
+-------
+
+- No longer need NGINX
+
 [1.2.0]
 -------
 

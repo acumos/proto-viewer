@@ -329,14 +329,14 @@ def modify_doc(doc):
 
 server = Server({'/bkapp': modify_doc},
                 num_procs=1,  # see above!
+                port = 5006,
                 extra_patterns=[(
                     '/', IndexHandler),
                     ('/data', DataHandler),
                     ('/image/([^/]+)', ImageHandler),
                     ('/onap_topic_subscription/([^/]+)', ONAPMRTopicHandler)],
                 address="0.0.0.0",
-                # :80 is when running in docker behind nginx, 5006 when local
-                allow_websocket_origin=["*:80", "*:5006"])
+                allow_websocket_origin=["*:5006"])
 server.start()
 
 if __name__ == '__main__':

@@ -28,9 +28,6 @@ RUN apt-get install -y nodejs
 RUN npm -v
 RUN npm install protobuf-jsonschema -g
 
-#### INSTALL NGINX 
-RUN  apt-get install -y nginx
-
 #### INSTALL REDIS, STOLEN FROM https://github.com/dockerfile/redis/blob/master/Dockerfile
 RUN \
   cd /tmp && \
@@ -53,14 +50,13 @@ RUN pip install --upgrade pip
 
 ##### INSTALL THIS APP
 WORKDIR /tmp
-COPY nginx-default.conf /etc/nginx/sites-available/default
 RUN pip install -r requirements.txt
 RUN pip install .
 
-EXPOSE 80
+EXPOSE 5006
 
 RUN mkdir /tmp/protofiles 
 RUN chmod 777 /tmp/protofiles
 
-#START NGINX, REDIS, AND THE APP
-CMD /etc/init.d/nginx start; redis-server --daemonize yes; run.py
+#START REDIS, AND THE APP
+CMD redis-server --daemonize yes; run.py
