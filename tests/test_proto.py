@@ -5,22 +5,34 @@ from acumos_proto_viewer import data
 
 def test_register_load(monkeypatch, monkeyed_requests_get, cleanuptmp):
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
-    register_proto_from_url("http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
+    register_proto_from_url(
+        "http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
+    register_proto_from_url(
+        "http://myserver.com/fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto")
     assert('fakemodelid_100_proto' in data.list_known_protobufs())
+    assert('fakemodelidwitharrays_100_proto' in data.list_known_protobufs())
     test_pb2 = load_proto("fakemodelid_100_proto")
     test_pb2 = load_proto("fakemodelid_100_proto")  # cache hit
 
     assert isinstance(test_pb2, ModuleType)
+
+    test2_pb2 = load_proto("fakemodelidwitharrays_100_proto")
+    test2_pb2 = load_proto("fakemodelidwitharrays_100_proto")  # cache hit
+
+    assert isinstance(test2_pb2, ModuleType)
+
     cleanuptmp()
 
 
 def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
     register_proto_from_url("fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
+    register_proto_from_url(
+        "fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto")
     assert('fakemodelid_100_proto' in data.list_known_protobufs())
+    assert('fakemodelidwitharrays_100_proto' in data.list_known_protobufs())
 
     js = _protobuf_to_js("fakemodelid_100_proto")
-    cleanuptmp()
     assert js == {
         "definitions": {
             "mygreatpackage.Data1": {
@@ -93,3 +105,36 @@ def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
             }
         }
     }
+    js = _protobuf_to_js("fakemodelidwitharrays_100_proto")
+    print(js)
+    assert(js == {
+        "definitions": {
+            "YKhGXjKWHYsPwKJFfEPnmoHOkDkPKBxX.ImageTagSet": {
+                "title": "ImageTagSet",
+                "type": "object",
+                "properties": {
+                    "image": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                        }
+                    },
+                    "tag": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "score": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    })
+    cleanuptmp()

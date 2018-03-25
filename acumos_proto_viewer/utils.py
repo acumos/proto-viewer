@@ -24,8 +24,8 @@ def _check_model_id_already_registered(model_id):
     """
     Checks whether a model_id already exists so we can exit immediately before doing work
     """
-    if isfile(_gen_compiled_proto_path(model_id)):
-        _logger.debug("pb2 module already existed, returning immediately")
+    from acumos_proto_viewer import data
+    if isfile(_gen_compiled_proto_path(model_id)) and model_id in data.proto_data_structure:
         return True
     return False
 
@@ -37,8 +37,6 @@ def _compile_proto(model_id):
         TODO: add a flag to force a recompile
     """
     gen_module = _gen_compiled_proto_path(model_id)
-    if _check_model_id_already_registered(model_id):
-        return gen_module
 
     expected_proto = "{0}/{1}.proto".format(OUTPUT_DIR, model_id)
     if not isfile(expected_proto):
@@ -110,7 +108,8 @@ def _register_proto(proto_name, model_id):
     Later this would get done on demand when an unknown message type comes in by quering the catalog with the model_id
     """
     from acumos_proto_viewer import data
-    _logger.info("Registering proto %s", model_id)
+
+    _logger.info("Registering previously unregistered proto %s", model_id)
     _compile_proto(model_id)
     data.proto_data_structure[model_id] = {}
     j_schema = _protobuf_to_js(model_id)
@@ -123,6 +122,9 @@ def _register_proto(proto_name, model_id):
         data.proto_data_structure[model_id]["messages"][key.split(
             ".")[1]] = {"properties": j_schema["definitions"][key]["properties"]}
 
+    _logger.debug("Cooresponding JSON schema is: ")
+    _logger.debug(json.dumps(j_schema))
+
 
 def _proto_url_to_model_id(url):
     # protoc cannot handle filenames with . in it!. It also renames "-" to "_"
@@ -134,29 +136,24 @@ def _wget_proto(url, model_id):
     Used to download the proto files
     """
     fname = model_id + ".proto"
-    if _check_model_id_already_registered(model_id):
+    _logger.debug("Attempting to download {0}".format(url))
+    r = requests.get(url)
+    if r.status_code == 200:
+        wpath = "{0}/{1}".format(OUTPUT_DIR, fname)
+        with open(wpath, "w") as f:
+            f.write(r.text)
+        _logger.debug("{0} succesfully downloaded to {1}, modeil_id = {2}".format(
+            url, wpath, model_id))
         return model_id, fname
     else:
-        _logger.debug("Attempting to download {0}".format(url))
-        r = requests.get(url)
-        if r.status_code == 200:
-            wpath = "{0}/{1}".format(OUTPUT_DIR, fname)
-            with open(wpath, "w") as f:
-                f.write(r.text)
-            _logger.debug("{0} succesfully downloaded to {1}, modeil_id = {2}".format(
-                url, wpath, model_id))
-            return model_id, fname
-        else:
-            _logger.error("Error: unable to reach {0}".format(url))
-            raise SchemaNotReachable()
+        _logger.error("Error: unable to reach {0}".format(url))
+        raise SchemaNotReachable()
 
 
 def _wget_jsonschema(url, model_id):
     """
     Used to download a JSON Schema file
     """
-    if _check_model_id_already_registered(model_id):
-        return model_id
     _logger.debug("Attempting to download {0}".format(url))
     r = requests.get(url)
     if r.status_code == 200:
@@ -174,6 +171,10 @@ def _register_schema_from_url(url, schema_type, model_id):
     This function handles both cases: when it recieves a full URL, and when it recieves a partial.
     If it is not given a full URL, AND that NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable
     """
+    # short circut if already registered
+    if _check_model_id_already_registered(model_id):
+        return model_id
+
     if url.startswith("http"):
         targeturl = url
     else:

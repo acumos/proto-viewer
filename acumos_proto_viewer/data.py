@@ -9,11 +9,12 @@ from datetime import date, datetime
 from datetime import time as dttime
 import time
 import json
-import marshal
+import pickle
+import copy
 
 import requests
 
-from google.protobuf import text_format
+from google.protobuf.json_format import MessageToJson
 from acumos_proto_viewer import get_module_logger
 import redis
 
@@ -35,19 +36,34 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
     mod = load_proto(model_id)
     msg = getattr(mod, message_name)()
     msg.ParseFromString(binarydata)
-    r = {}
-    fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys(
-    )
+
+    json_equiv = json.loads(MessageToJson(msg))
+    fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys()
     for f in fields:
         if f == "apv_recieved_at":
-            r[f] = int(time.time())
-        elif f == "apv_model_as_string":
-            r[f] = text_format.MessageToString(msg)
+            json_equiv[f] = int(time.time())
         elif f == "apv_sequence_number":
-            r[f] = sequence_no
+            json_equiv[f] = sequence_no
+        elif f == "apv_model_as_string":
+            pass  # handled later below
         else:
-            r[f] = getattr(msg, f)
-    return r
+            # check if the item type was bytes, and preserve it if so, no encoding!
+            # TODO! Check for nested things like arrays of bytes!
+            item = getattr(msg, f)
+            # print((f, item, type(item), json_equiv[f]))
+            if isinstance(item, bytes) or isinstance(item, int):
+                json_equiv[f] = item
+
+    # in order to do the json serialization for the RAW format, we have to create a copy of this where we take the bytes and b64 them
+    json_copy = copy.deepcopy(json_equiv)
+    del json_copy["apv_sequence_number"]
+    del json_copy["apv_recieved_at"]
+    for k in json_copy:
+        v = json_copy[k]
+        if isinstance(v, bytes):
+            json_copy[k] = "<RAW BYTES>"
+    json_equiv["apv_model_as_string"] = json.dumps(json_copy, indent=4, sort_keys=True)
+    return json_equiv
 
 
 def _get_bucket():
@@ -86,7 +102,7 @@ def get_raw_data(model_id, message_name, index_start, index_end):
     """
     index = _get_raw_data_source_index(model_id, message_name)
     # you cannot have lists of dicts in myredis, the solution is to serialize them, see https://stackoverflow.com/questions/8664664/list-of-dicts-in-myredis
-    return [marshal.loads(x) for x in myredis.lrange(index, index_start, index_end)] if myredis.exists(index) else []
+    return [pickle.loads(x) for x in myredis.lrange(index, index_start, index_end)] if myredis.exists(index) else []
 
 
 def inject_data(binarydata, proto_url, message_name):
@@ -104,7 +120,12 @@ def inject_data(binarydata, proto_url, message_name):
     # safegaurd against malformed data
     if sorted(m.keys()) == sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys()):
         # this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
-        myredis.rpush(index, marshal.dumps(m))
+        try:
+            pickled_message = pickle.dumps(m)
+            myredis.rpush(index, pickled_message)
+        except Exception as exc:
+            _logger.error("Could not pickle data or upload it to redis")
+            _logger.exception(exc)
         if size == 0:
             _logger.debug(
                 "Created new data source and setting a TTL of one day")
@@ -178,7 +199,7 @@ def mr_reader_thread(fully_qualified_topic_url, topic_name):
                 _logger.error("data item does not match the schema!")
 
             # this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
-            myredis.rpush(index, marshal.dumps(data_item))
+            myredis.rpush(index, pickle.dumps(data_item))
             _logger.debug("MR reader for {0} recieved valid data".format(topic_name))
             if size == 0:
                 _logger.debug(

@@ -22,17 +22,23 @@ def test_get_source_index():
     assert get_source_index(sid, mid, mess_name, field_name) == expected_index
 
 
-def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, cleanuptmp):
+def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, fake_msg_with_arrays, cleanuptmp):
     """
     Test run_handlers.handle_data_post
     """
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
     assert('fakemodelid_100_proto' not in data.list_known_protobufs())
+    assert('fakemodelidwitharrays_100_proto' not in data.list_known_protobufs())
     headers = {"PROTO-URL": "fakemodelid/1.0.0/fakemodelid-1.0.0-proto",
                "Message-Name": "Data1"}
-
     code, status = handle_data_post(headers, fake_msg())
+
+    headers = {"PROTO-URL": "fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto",
+               "Message-Name": "ImageTagSet"}
+    code, status = handle_data_post(headers, fake_msg())
+
     assert('fakemodelid_100_proto' in data.list_known_protobufs())
+    assert('fakemodelidwitharrays_100_proto' in data.list_known_protobufs())
 
     assert get_model_properties("fakemodelid_100_proto", "Data1", "protobuf") == {
         'a': {'type': 'number'},
@@ -54,6 +60,39 @@ def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, cleanupt
         'apv_model_as_string': {'type': 'string'},
         'apv_sequence_number': {'type': 'integer'}}
 
+    assert get_model_properties("fakemodelidwitharrays_100_proto", "ImageTagSet", "protobuf") == {
+        "image": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+            }
+        },
+        "tag": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "score": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "apv_recieved_at": {
+            "type": "integer"
+        },
+        "apv_model_as_string": {
+            "type": "string"
+        },
+        "apv_sequence_number": {
+            "type": "integer"
+        }
+    }
+
+    # test failures
     headers = {"PROTO-UR": "fakemodelid/1.0.0/fakemodelid-1.0.0-proto",
                "Message-Name": "Data1"}
 
@@ -129,7 +168,8 @@ def test_get_modelid_messagename_type(monkeypatch):
             if arg == MESSAGE_SELECTION:
                 return FakeVal("amazing_message")
 
-    assert ("amazing_model", "amazing_message", "protobuf") == get_modelid_messagename_type(FakeDoc)
+    assert ("amazing_model", "amazing_message",
+            "protobuf") == get_modelid_messagename_type(FakeDoc)
 
     class FakeDoc2():
         def __init__():
@@ -139,4 +179,5 @@ def test_get_modelid_messagename_type(monkeypatch):
             if arg == MODEL_SELECTION:
                 return FakeVal("topic_amazing_model")
 
-    assert ("amazing_model", "amazing_model_messages", "jsonschema") == get_modelid_messagename_type(FakeDoc2)
+    assert ("amazing_model", "amazing_model_messages",
+            "jsonschema") == get_modelid_messagename_type(FakeDoc2)
