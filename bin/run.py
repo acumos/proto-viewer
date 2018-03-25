@@ -157,6 +157,11 @@ def _bokeh_periodic_update(sind, model_id, message_name, field_transforms={}, st
                 val = m[mk]
                 if mk in field_transforms:
                     val = field_transforms[mk][0](val, **field_transforms[mk][1])
+                if isinstance(val, bytes):
+                    # this can happen in rare cases, like RAW being used to try to display an image
+                    # bokeh internally does a JSON serialization so we can't let bytes slip through
+                    # this does not affect image rendering is that is not put into the bokeh CDS, only the URL is
+                    val = "<RAW BYTES>"
                 newdata[mk].append(val)
             num_data += 1
 

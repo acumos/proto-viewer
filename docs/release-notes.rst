@@ -27,6 +27,10 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic
 Versioning <http://semver.org/>`__.
 
+[1.4.2] - 3/25/18
+
+- Make raw formatting work even with bytes by truncating them
+
 [1.4.1] - 3/25/18
 -------
 
