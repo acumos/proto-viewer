@@ -224,12 +224,22 @@ def graphs_change():
         d.add_root(column(Div(text=""), widgetbox([imageselect, mimeselect]), name=IMAGE_MIME_SELECTION))
 
     if graph_val in ["raw"]:
-        p = figure(plot_width=500, plot_height=500, y_range=(0, 4), title="", name=FIGURE_MODEL)
+        p = figure(plot_width=500, plot_height=500,
+                   background_fill_color="white",
+                   y_range=(-40, 0), title="", name=FIGURE_MODEL)
+
         p.xaxis.visible = False
         p.yaxis.visible = False
         sind = run_handlers.get_source_index(d.session_context.id, model_id, message_name)
         _install_callback_and_cds(sind, model_id, message_name, stream_limit=1)
-        p.text(x='apv_sequence_number', y=0, text='apv_model_as_string', source=d.get_model_by_name(sind), text_font_size="10pt")
+        p.text(x='apv_sequence_number',
+               y=0,
+               text='apv_model_as_string',
+               source=d.get_model_by_name(sind),
+               text_font_size="10pt",
+               text_line_height=0.7,
+               text_baseline="top",
+               text_align="left")
         p.x_range.follow = "end"  # don't jam all the data into the graph; "window" it
         p.x_range.follow_interval = 1  # don't jam all the data into the graph; "window" it
         p.x_range.range_padding = 0

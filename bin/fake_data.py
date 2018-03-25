@@ -38,9 +38,9 @@ while True:
 
     #try a test with arrays
     new_dict = {}
-    for listKey in ['good', 'bad', 'ugly']:
+    for listKey in ['good', 'bad', 'ugly', 'very good', 'very bad', 'very ugly', 'beautiful', 'horrid', 'amazing', 'terrible']:
         new_dict[listKey] = random.random()
-    msg1 = ARRAY_TEST.ImageTagSet(image = [0,0,0], tag=list(new_dict.keys()), score=list(new_dict.values()))
+    msg1 = ARRAY_TEST.ImageTagSet(image = [0,1,2,3,4,5,6,7,8,9,10], tag=list(new_dict.keys()), score=list(new_dict.values()))
     msg1b = msg1.SerializeToString()
     try:
         r = requests.post(url,
