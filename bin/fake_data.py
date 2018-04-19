@@ -4,6 +4,7 @@ import random
 from time import sleep
 from acumos_proto_viewer.utils import load_proto
 import sys
+import os
 
 test = load_proto("probe_testxyz_100_proto")
 test2 = load_proto("probe_testimage_100_proto")
@@ -14,6 +15,8 @@ if len(sys.argv) > 1:
     HOST = sys.argv[1]
 print("Fake Data Target Host: {0}".format(HOST))
 url = "http://{0}/data".format(HOST)
+
+NEXUS = os.environ["NEXUSENDPOINTURL"]
 
 X = 0
 while True:
@@ -27,7 +30,7 @@ while True:
         try:
             r = requests.post(url,
                               data=msgb,
-                              headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/probe_testxyz/1.0.0/probe_testxyz-1.0.0-proto",
+                              headers={"PROTO-URL": "{0}/probe_testxyz/1.0.0/probe_testxyz-1.0.0-proto".format(NEXUS),
                                        "Message-Name": "XYZData"})
             print(r.status_code)
             assert(msgb == r.content)
@@ -45,7 +48,7 @@ while True:
     try:
         r = requests.post(url,
                           data=msg1b,
-                          headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/image-mood-classification/1.0.0/image-mood-classification-1.0.0-proto",
+                          headers={"PROTO-URL": "{0}/image-mood-classification/1.0.0/image-mood-classification-1.0.0-proto".format(NEXUS),
                                    "Message-Name": "ImageTagSet"})
         print(r.status_code)
         assert(msg1b == r.content)
@@ -60,7 +63,7 @@ while True:
     try:
         r = requests.post(url,
                           data=msg2b,
-                          headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/probe_testimage/1.0.0/probe_testimage-1.0.0-proto",
+                          headers={"PROTO-URL": "{0}/probe_testimage/1.0.0/probe_testimage-1.0.0-proto".format(NEXUS),
                                    "Message-Name": "TransformedImagePNG"})
         print(r.status_code)
         assert(msg2b == r.content)
@@ -75,7 +78,7 @@ while True:
     try:
         r = requests.post(url,
                           data=msg3b,
-                          headers={"PROTO-URL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_raw/probe_testimage/1.0.0/probe_testimage-1.0.0-proto",
+                          headers={"PROTO-URL": "{0}/probe_testimage/1.0.0/probe_testimage-1.0.0-proto".format(NEXUS),
                                    "Message-Name": "TransformedImageJPEG"})
         print(r.status_code)
         assert(msg3b == r.content)
