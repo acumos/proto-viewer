@@ -26,10 +26,11 @@ Dependencies
 If you are running in Docker, there are no external dependencies, it is,
 for better or worse[1], totally self contained.
 
-If you are running locally, you will need to have redis running on the
-standard port, reachable from **localhost**.
+If you are running locally, you will need to have :
+1. redis running on the standard port, reachable from **localhost**
+2. you will also need an `npm` package: `npm install protobuf-jsonschema`.
 
-[1] This Docker container runs Nginx, Redis, and Bokeh..
+[1] This Docker container runs Nginx, Redis, and Bokeh. At one point I was told the probe had to be a single Docker container.
 
 Data Retention
 ==============
