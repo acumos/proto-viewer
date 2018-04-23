@@ -89,6 +89,7 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+apv16/
 
 # Spyder project settings
 .spyderproject
@@ -102,3 +103,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# eclipse metadata
+.classpath
+.externalToolBuilders/
+.project
+.pydevproject
+.settings/
+
