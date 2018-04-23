@@ -9,7 +9,7 @@ MODEL_SELECTION = "modelselec"
 AFTER_MODEL_SELECTION = "aftermodelselec"
 MESSAGE_SELECTION = "messageselec"
 GRAPH_SELECTION = "graphselec"
-GRAPH_OPTIONS = ["Please Select", "line", "scatter", "step", "image", "raw"]
+GRAPH_OPTIONS = ["Please Select", "line", "scatter", "step", "image", "table", "raw"]
 FIGURE_MODEL = "thefig"
 FIELD_SELECTION = "fieldsselection"
 IMAGE_MIME_SELECTION = "imagemimeselection"
@@ -17,6 +17,8 @@ IMAGE_SELECTION = "imageselect"
 MIME_SELECTION = "mimeselection"
 X_AXIS_SELECTION = "xaxisselect"
 Y_AXIS_SELECTION = "yaxisselect"
+COLUMN_MULTISELECT = "colmultiselect"
+COLUMN_SELECTION = "colselect"
 
 
 def get_modelid_messagename_type(curdoc):
