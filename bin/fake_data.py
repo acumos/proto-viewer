@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Acumos - Apache 2.0
+# Injects data to proto viewer server from files in /tmp;
+# the data files include images so are not in git.
+
 import requests
 import random
 from time import sleep
@@ -16,6 +20,7 @@ if len(sys.argv) > 1:
 print("Fake Data Target Host: {0}".format(HOST))
 url = "http://{0}/data".format(HOST)
 
+# well-known proto files are fetched from this server
 NEXUS = os.environ["NEXUSENDPOINTURL"]
 
 X = 0
@@ -32,25 +37,24 @@ while True:
                               data=msgb,
                               headers={"PROTO-URL": "{0}/probe_testxyz/1.0.0/probe_testxyz-1.0.0-proto".format(NEXUS),
                                        "Message-Name": "XYZData"})
-            print(r.status_code)
+            print("Testxyz: status code: {0}".format(r.status_code))
             assert(msgb == r.content)
             sleep(0.1)
         except requests.exceptions.ConnectionError: #allow this script to keep running when developing and shutting on/off the server
             pass
 
-
     #try a test with arrays
     new_dict = {}
     for listKey in ['good', 'bad', 'ugly', 'very good', 'very bad', 'very ugly', 'beautiful', 'horrid', 'amazing', 'terrible']:
         new_dict[listKey] = random.random()
-    msg1 = ARRAY_TEST.ImageTagSet(image = [0,1,2,3,4,5,6,7,8,9,10], tag=list(new_dict.keys()), score=list(new_dict.values()))
+    msg1 = ARRAY_TEST.ImageTagSet(image = [0,1,2,3,4,5,6,7,8,9], tag=list(new_dict.keys()), score=list(new_dict.values()))
     msg1b = msg1.SerializeToString()
     try:
         r = requests.post(url,
                           data=msg1b,
                           headers={"PROTO-URL": "{0}/image-mood-classification/1.0.0/image-mood-classification-1.0.0-proto".format(NEXUS),
                                    "Message-Name": "ImageTagSet"})
-        print(r.status_code)
+        print("Img-mood-class: status code: {0}".format(r.status_code))
         assert(msg1b == r.content)
     except requests.exceptions.ConnectionError: #allow this script to keep running when developing and shutting on/off the server
         pass
@@ -65,7 +69,7 @@ while True:
                           data=msg2b,
                           headers={"PROTO-URL": "{0}/probe_testimage/1.0.0/probe_testimage-1.0.0-proto".format(NEXUS),
                                    "Message-Name": "TransformedImagePNG"})
-        print(r.status_code)
+        print("probe test img png: status code: {0}".format(r.status_code))
         assert(msg2b == r.content)
     except requests.exceptions.ConnectionError:
         pass
@@ -80,7 +84,7 @@ while True:
                           data=msg3b,
                           headers={"PROTO-URL": "{0}/probe_testimage/1.0.0/probe_testimage-1.0.0-proto".format(NEXUS),
                                    "Message-Name": "TransformedImageJPEG"})
-        print(r.status_code)
+        print("probe test img jpg: status code: {0}".format(r.status_code))
         assert(msg3b == r.content)
     except requests.exceptions.ConnectionError:
         pass
