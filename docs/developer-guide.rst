@@ -20,6 +20,48 @@
 Proto Viewer Developer Guide
 ============================
 
+This project allows visualization of data being transferred in protobuf format.
+Probing a specific message requires access to the corresponding protocol buffer
+definition (.proto) file.
+
+Development Quickstart
+======================
+
+The following steps set up a development environment without use of Docker.
+
+1. Obtain the set of test data (messages and image files) from the original developer and unpack to the /tmp directory.  You should have a file /tmp/1.png and so on.
+
+2. Install the redis server in your local computer.
+
+3. Clone the proto-viewer repository::
+
+    git clone https://gerrit.acumos.org/r/proto-viewer
+
+4. Create a virtual environment with Python 3.6 (version 3.5 may not work, use 3.6)::
+
+    virtualenv -p python3.6 apv36
+
+5. Use the virtual environment to install the package::
+
+    ./apv36/bin/pip install -r requirements.txt
+    ./apv36/bin/pip install .
+
+6. Start the redis server::
+
+    redis-server --daemonize yes
+
+7. Set this environment variable with the URL of the Nexus server that has the required protobuf files::
+
+    export NEXUSENDPOINTURL=http://nexus.domain.com/repository/repo
+
+8. Launch the Bokeh-enabled web server::
+
+    ./apv36/bin/python3 bin/run.py
+
+9. Start the data-injection script::
+
+    ./apv36/bin/python3 fake_data.py
+
 Dependencies
 ============
 
