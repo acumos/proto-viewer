@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8af2ef8f_96c5d275",
+        "filename": ".gitignore",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-04-24T01:39:47Z",
+      "side": 1,
+      "message": "Many moons ago I too used Pydev.",
+      "revId": "72d839be2bc42d7ad12fa1be58a7f4552569d965",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d67008ec_bdd7fb28",
+        "filename": "bin/run.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-04-24T01:39:47Z",
+      "side": 1,
+      "message": "thank you for adding docstrings, mea culpa",
+      "revId": "72d839be2bc42d7ad12fa1be58a7f4552569d965",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cdb69bd_aedfd1f3",
+        "filename": "bin/run.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-04-24T01:39:47Z",
+      "side": 1,
+      "message": "can this debugging code be removed now? this if will never trigger so i would prefer to remove this code",
+      "revId": "72d839be2bc42d7ad12fa1be58a7f4552569d965",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
