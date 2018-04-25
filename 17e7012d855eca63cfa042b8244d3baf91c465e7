@@ -16,6 +16,24 @@
       "revId": "17e7012d855eca63cfa042b8244d3baf91c465e7",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a898a2f_6be873a5",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-04-25T18:13:58Z",
+      "side": 1,
+      "message": "As run in LF it might not matter.  If you build locally on a host where the docker layers are persistent this can cause real trouble.",
+      "parentUuid": "663c0788_c7751f91",
+      "revId": "17e7012d855eca63cfa042b8244d3baf91c465e7",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
