@@ -16,6 +16,24 @@
       "revId": "aaa407b6a8ff741d687091491dbaa01336a597f4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7660dc2c_59514952",
+        "filename": "bin/run.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-04-25T19:50:56Z",
+      "side": 1,
+      "message": "Is it possible that the data arrives as a python list, and python is \"helpfully\" rendering it as CSV? Where does this rendering happen?",
+      "parentUuid": "5d0c071e_1b5b2fde",
+      "revId": "aaa407b6a8ff741d687091491dbaa01336a597f4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
