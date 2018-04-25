@@ -34,6 +34,24 @@
       "revId": "aaa407b6a8ff741d687091491dbaa01336a597f4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "688e3da8_9bfc1755",
+        "filename": "bin/run.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-04-25T19:56:48Z",
+      "side": 1,
+      "message": "in the raw data it should be a list. You\u0027ll need to play around in the function `_bokeh_periodic_update` at the top of this file. That shows what the raw data is (good ol printf it maybe) and turns it into a json, which it must be for a CDS (CDS internally serializes to json so it must be json serializable)",
+      "parentUuid": "7660dc2c_59514952",
+      "revId": "aaa407b6a8ff741d687091491dbaa01336a597f4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
