@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff3991a9_74e94a28",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-04-25T16:04:38Z",
+      "side": 1,
+      "message": "Mukesh, do you see any impact in your deployer code to update the Probe\u0027s docker details with this change in name?",
+      "range": {
+        "startLine": 7,
+        "startChar": 16,
+        "endLine": 7,
+        "endChar": 35
+      },
+      "revId": "301bf232f15f579610b9dddf1afcbc87b7172d8e",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
