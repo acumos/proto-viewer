@@ -1,11 +1,8 @@
 FROM python:3.6
-MAINTAINER tommy@research.att.com
 ADD . /tmp
 
 # Install unzip
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y apt-utils unzip
+RUN apt-get update && apt-get -y upgrade && apt-get install -y apt-utils unzip
 
 #### INSTALL PROTOC
 # stolen from https://gist.github.com/sofyanhadia/37787e5ed098c97919b8c593f0ec44d8
