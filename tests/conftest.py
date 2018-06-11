@@ -144,7 +144,7 @@ def fake_msg_with_arrays_jsonwb():
         return {"image": ['1', '2', '3'],  # TODO! This is messed up because data._msg_to_json_preserve_bytes does not currently handle nested itens, you get whatever google gives you!
                 "tag": ["fish", "cat", "dog"],
                 "score": [0.8, 0.9, 1.0],
-                'apv_recieved_at': 55555555555,
+                'apv_received_at': 55555555555,
                 'apv_sequence_number': 1,
                 'apv_model_as_string': '{\n    "image": [\n        "1",\n        "2",\n        "3"\n    ],\n    "score": [\n        0.8,\n        0.9,\n        1.0\n    ],\n    "tag": [\n        "fish",\n        "cat",\n        "dog"\n    ]\n}'}
     return _fake_msg_with_arrays_jsonwb
@@ -160,7 +160,7 @@ def fake_msg_as_jsonwb():
                 'e': True,
                 'f': 'helives',
                 'g': b'U+1F615',
-                'apv_recieved_at': 55555555555,
+                'apv_received_at': 55555555555,
                 'apv_model_as_string': '{\n    "a": 1.1111111111111111e+24,\n    "b": 666.666015625,\n    "c": 777,\n    "d": 77777777777777,\n    "e": true,\n    "f": "helives",\n    "g": "<RAW BYTES>"\n}',
                 'apv_sequence_number': 1}
     return _fake_msg_as_jsonwb

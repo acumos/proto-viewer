@@ -228,7 +228,7 @@ def graphs_change():
 
     if graph_val in ["image"]:
         # alter the field options for known non-image fields
-        field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in ["apv_recieved_at", "apv_sequence_number", "apv_model_as_string"]]
+        field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in ["apv_received_at", "apv_sequence_number", "apv_model_as_string"]]
         imageselect = Select(title="Image Field", value=DEFAULT_UNSELECTED, options=[DEFAULT_UNSELECTED] + field_options, name=IMAGE_SELECTION)
         mimeselect = Select(title="MIME Type", value=DEFAULT_UNSELECTED, options=[DEFAULT_UNSELECTED] + SUPPORTED_MIME_TYPES, name=MIME_SELECTION)
         imageselect.on_change('value', lambda attr, old, new: image_selection_change())
@@ -238,7 +238,7 @@ def graphs_change():
     if graph_val in ["table"]:
         # TODO: limit selectable columns to whose of the same size (table height)
         # use just the field name; don't show properties in the multi-select box
-        col_options = [k for k in props if k not in ["apv_recieved_at", "apv_sequence_number", "apv_model_as_string"]]
+        col_options = [k for k in props if k not in ["apv_received_at", "apv_sequence_number", "apv_model_as_string"]]
         columnmultiselect = MultiSelect(title="Columns:", value=[], options=col_options, name=COLUMN_MULTISELECT)
         columnmultiselect.on_change('value', lambda attr, old, new: column_selection_change())
         d.add_root(column(Div(text=""), widgetbox([columnmultiselect]), name=COLUMN_SELECTION))

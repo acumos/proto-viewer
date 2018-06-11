@@ -15,7 +15,8 @@ def on_server_unloaded(server_context):
 
 def on_session_created(session_context):
     ''' If present, this function is called when a session is created. '''
-    _logger.debug("on_server_created called")
+    sid = session_context.id
+    _logger.debug("on_session_created called for session_id {0}".format(sid))
 
 
 def on_session_destroyed(session_context):

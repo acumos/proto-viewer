@@ -28,10 +28,10 @@ myredis = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no):
     """
-    Google's builtin method MessageToJson *silently reencodes* byte fields as base64
-    But we don't want that here, becuase we have messages with raw image bytes
-    So this custom function preserves byte fields
-    Also it injects a timestamp
+    Converts an inbound protobuf message to JSON, preserving byte fields.
+    Google's builtin method MessageToJson *silently reencodes* byte fields as base64.
+    But we don't want that because that breaks images that arrive as raw bytes. So
+    this preserves byte fields. Also it injects values for well-known probe fields.
     """
     mod = load_proto(model_id)
     msg = getattr(mod, message_name)()
@@ -40,7 +40,7 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
     json_equiv = json.loads(MessageToJson(msg))
     fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys()
     for f in fields:
-        if f == "apv_recieved_at":
+        if f == "apv_received_at":
             json_equiv[f] = int(time.time())
         elif f == "apv_sequence_number":
             json_equiv[f] = sequence_no
@@ -54,10 +54,11 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
             if isinstance(item, bytes) or isinstance(item, int):
                 json_equiv[f] = item
 
-    # in order to do the json serialization for the RAW format, we have to create a copy of this where we take the bytes and b64 them
+    # in order to do the json serialization for the RAW format, create a copy
+    # of this where we take the bytes and b64 them
     json_copy = copy.deepcopy(json_equiv)
     del json_copy["apv_sequence_number"]
-    del json_copy["apv_recieved_at"]
+    del json_copy["apv_received_at"]
     for k in json_copy:
         v = json_copy[k]
         if isinstance(v, bytes):
@@ -68,16 +69,19 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
 
 def _get_bucket():
     """
-    Note: we use this Unix timestamp bucketed methodlogy described here because myredis list members can't have TTLs:
+    Note: we use the Unix timestamp bucketed methodology described below
+    because myredis list members can't have TTLs:
         https://quickleft.com/blog/how-to-create-and-expire-list-items-in-myredis/
-    The result of this is that a current session logging into the probe will see the data since the last midnight. If this isn't good enough, and memory is plentiful, we can go to the last week or something.
+    The result of this is that a current session logging into the probe will see
+    the data since the last midnight. If this isn't good enough, and memory is
+    plentiful, we can go to the last week or something.
     """
     return str(int(datetime.combine(date.today(), dttime.min).timestamp()))
 
 
 def _get_raw_data_source_index(model_id, message_name):
     """
-    Get the myredis index given model_id and message_name
+    Gets the myredis index given model_id and message_name
     """
     bucket = _get_bucket()
     h = "{0}{1}{2}".format(model_id, message_name, bucket)
@@ -95,19 +99,19 @@ def get_raw_data_source_size(model_id, message_name):
 
 def get_raw_data(model_id, message_name, index_start, index_end):
     """
-    Get the raw data (list of records) for a (model_id, message_name) pair.
+    Gets the raw data (list of records) for a (model_id, message_name) pair.
     These data sources are populated from the /senddata endpoint.
-
-        We always go from the last midngight
+    We always go from the last midnight.
     """
     index = _get_raw_data_source_index(model_id, message_name)
-    # you cannot have lists of dicts in myredis, the solution is to serialize them, see https://stackoverflow.com/questions/8664664/list-of-dicts-in-myredis
+    # you cannot have lists of dicts in myredis, the solution is to serialize them,
+    # see https://stackoverflow.com/questions/8664664/list-of-dicts-in-myredis
     return [pickle.loads(x) for x in myredis.lrange(index, index_start, index_end)] if myredis.exists(index) else []
 
 
 def inject_data(binarydata, proto_url, message_name):
     """
-    Inject data into the appropriate queue
+    Injects data into the appropriate queue.
     In the future if the data moves to a database this would go away
     """
     # register the proto file. Will return immediately if already exists
@@ -115,9 +119,8 @@ def inject_data(binarydata, proto_url, message_name):
 
     size = get_raw_data_source_size(model_id, message_name)
     index = _get_raw_data_source_index(model_id, message_name)
-    m = _msg_to_json_preserve_bytes(binarydata, model_id, message_name,
-                                    size + 1)
-    # safegaurd against malformed data
+    m = _msg_to_json_preserve_bytes(binarydata, model_id, message_name, size + 1)
+    # safeguard against malformed data
     if sorted(m.keys()) == sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys()):
         # this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
         try:
@@ -127,8 +130,7 @@ def inject_data(binarydata, proto_url, message_name):
             _logger.error("Could not pickle data or upload it to redis")
             _logger.exception(exc)
         if size == 0:
-            _logger.debug(
-                "Created new data source and setting a TTL of one day")
+            _logger.debug("Created new data source and setting a TTL of one day")
             myredis.expire(index, 60 * 60 * 24)
     else:
         _logger.debug("Data dropped! {0} compared to {1}".format(m.keys(), sorted(
@@ -137,7 +139,7 @@ def inject_data(binarydata, proto_url, message_name):
 
 def delete_mr_subscription(topic_name):
     """
-    Teardown an mr subscription
+    Teardown a message-router subscription
     """
     # all we need to do is delete the active flag and the thread will kill itself
     if myredis.get(topic_name) is None:
@@ -148,7 +150,7 @@ def delete_mr_subscription(topic_name):
 
 def setup_mr_subscription(fully_qualified_topic_url, schema_url, topic_name):
     """
-    Creates a new MR subscrption (if it doesn't already exist)
+    Creates a new message-router subscription (if it doesn't already exist)
     """
     register_jsonschema_from_url(schema_url, topic_name)
     if myredis.get(topic_name) is not None:
@@ -160,7 +162,7 @@ def setup_mr_subscription(fully_qualified_topic_url, schema_url, topic_name):
 
 def mr_reader_thread(fully_qualified_topic_url, topic_name):
     """
-    Enters an MR polling loop
+    Enters a message-router polling loop.
     topic name == model_id!
     """
     _logger.info("Starting MR thread on topic %s", topic_name)
@@ -189,7 +191,7 @@ def mr_reader_thread(fully_qualified_topic_url, topic_name):
 
             # set the apv fields
             data_item["apv_model_as_string"] = json.dumps(data_item)
-            data_item["apv_recieved_at"] = int(time.time())
+            data_item["apv_received_at"] = int(time.time())
             data_item["apv_sequence_number"] = item_sequence_no
 
             # safegaurd against malformed data
