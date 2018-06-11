@@ -23,7 +23,7 @@ COLUMN_SELECTION = "colselect"
 
 def get_modelid_messagename_type(curdoc):
     """
-    Given the current document, return the model_id selected and messagename/type
+    Given the current document, returns the model_id selected and messagename/type
     """
     model_id = curdoc.get_model_by_name(MODEL_SELECTION).value
     if model_id.startswith("protobuf_"):
@@ -39,7 +39,7 @@ def get_modelid_messagename_type(curdoc):
 
 def get_model_properties(model_id, message_name, model_type):
     """
-    Get model properties
+    Gets model properties
     """
     return data.proto_data_structure[model_id]["messages"][message_name]["properties"] if model_type == "protobuf" else data.jsonschema_data_structure[model_id]["json_schema"]["properties"]
 
@@ -58,7 +58,7 @@ def get_source_index(session_id, model_id, message_name, field_name=None):
 
 def handle_data_post(headers, req_body):
     """
-    Handle the  POST to /data
+    Handles the POST to /data. Uses metadata to discover the supporting protocol buffer definition.
     """
     proto_url = headers.get("PROTO-URL", None)  # the weird casing on these were told to me by the model connector team
     message_name = headers.get("Message-Name", None)
@@ -66,7 +66,8 @@ def handle_data_post(headers, req_body):
         return 400, "Error: PROTO-URL or Message-Name header missing."
     try:
         data.inject_data(req_body, proto_url, message_name)
-        # Kazi has asked that due to the way the Acmos "model conector" aka "blueprint orchestrator" works, that I should return the request body that I recieved. OK..
+        # Kazi has asked that due to the way the Acmos "model conector" aka "blueprint orchestrator" works,
+        # that I should return the request body that I received
         return 200, req_body
     except SchemaNotReachable:
         return 400, "Error: {0} was not downloadable!".format(proto_url)
@@ -74,7 +75,7 @@ def handle_data_post(headers, req_body):
 
 def handle_onap_mr_put(headers, topic_name):
     """
-    Handle the  PUT to /onap_topic_subscription
+    Handles the PUT to /onap_topic_subscription
     """
     server_hostname = headers.get("server-hostname")
     server_port = headers.get("server-port")
@@ -92,7 +93,7 @@ def handle_onap_mr_put(headers, topic_name):
 
 def handle_onap_mr_delete(topic_name):
     """
-    Remove an MR subscription
+    Remove a message-router subscription
     """
     existed = data.delete_mr_subscription(topic_name)
     if existed:

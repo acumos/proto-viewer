@@ -56,7 +56,7 @@ def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, fake_msg
         'e': {'type': 'boolean'},
         'f': {'type': 'string'},
         'g': {'type': 'string'},
-        'apv_recieved_at': {'type': 'integer'},
+        'apv_received_at': {'type': 'integer'},
         'apv_model_as_string': {'type': 'string'},
         'apv_sequence_number': {'type': 'integer'}}
 
@@ -81,7 +81,7 @@ def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, fake_msg
                 "type": "number"
             }
         },
-        "apv_recieved_at": {
+        "apv_received_at": {
             "type": "integer"
         },
         "apv_model_as_string": {
@@ -141,7 +141,7 @@ def test_handle_onap_mr_put_delete(monkeypatch, monkeyed_requests_get):
 
     assert get_model_properties("amazing_topic", "unused", "jsonschema") == {
         "value": {"type": "number", "description": ""},
-        "apv_recieved_at": {'type': 'integer'},
+        "apv_received_at": {'type': 'integer'},
         "apv_model_as_string": {'type': 'string'},
         "apv_sequence_number": {'type': 'integer'}}
 
