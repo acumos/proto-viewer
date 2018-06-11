@@ -22,12 +22,17 @@ Proto Viewer Developer Guide
 
 This project allows visualization of data being transferred in protobuf format.
 Probing a specific message requires access to the corresponding protocol buffer
-definition (.proto) file.
+definition (.proto) file on an external network server, usually a Nexus registry.
 
 Development Quickstart
 ======================
 
 The following steps set up a development environment without use of Docker.
+
+0. Install prerequisites locally so they can be invoked by the probe:
+
+    a. The protocol buffer compiler ("protoc"), version 3.5 or later
+    b. The protobuf-jsonschema tool, version 1.1.1 or later
 
 1. Obtain the set of test data (messages and image files) from the original developer and unpack to the /tmp directory.  You should have a file /tmp/1.png and so on.
 
@@ -121,7 +126,7 @@ Run
 Optional additional env variables
 ---------------------------------
 
-You can also pass in the following to alter the run behavioor:
+You can also pass in the following to alter the run behavior:
 
 1. UPDATE_CALLBACK_FREQUENCY // sets the frequency, in ms (1000=every
    second) of the callbacks that update the graphs on the screen, e.g.,
@@ -146,7 +151,7 @@ Extra Fields
 Every protobuf message that enters the **/senddata** endpoint is
 injected, by this server, with additional keys:
 
-1. **apv_recieved_at**: the epoch timestamp that the model was recieved
+1. **apv_recieved_at**: the epoch timestamp that the model was received
    at. Used for plotting a single variable against time
 2. **apv_model_as_string**: the string representation of the entire
    model, used for plotting the raw text if the user chooses
