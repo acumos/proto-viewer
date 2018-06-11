@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='acumos_proto_viewer',
-    version='1.5.0',
+    version='1.5.1',
     packages=find_packages(),
     author="Tommy Carpenter",
     author_email="tommy@research.att.com",

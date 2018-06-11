@@ -15,7 +15,7 @@ makedirs(OUTPUT_DIR, exist_ok=True)
 
 def _gen_compiled_proto_path(model_id):
     """
-    Generate the expected compiled proto path from a model_id
+    Generates the expected compiled proto path from a model_id
     """
     return "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
 
@@ -32,8 +32,9 @@ def _check_model_id_already_registered(model_id):
 
 def _compile_proto(model_id):
     """
+    Invokes the protoc utility to compile a .proto file and produce a Python module.
     The generated module will be at (OUTPUT_DIR)/(model_id)_pb2.py
-        NOTE: if this already exists, this function returns immediately. THis is a kind of cache I suppose.
+        NOTE: if this already exists, this function returns immediately. This is a kind of cache I suppose.
         TODO: add a flag to force a recompile
     """
     gen_module = _gen_compiled_proto_path(model_id)
@@ -73,16 +74,16 @@ def _load_module(module_name, path):
 
 def _inject_apv_keys_into_schema(schema_entrypoint):
     """
-    Inject the proto viewer keys into a jsonschema
+    Injects well-known proto-viewer keys into a jsonschema.
     """
-    schema_entrypoint["apv_recieved_at"] = {'type': 'integer'}
+    schema_entrypoint["apv_received_at"] = {'type': 'integer'}
     schema_entrypoint["apv_model_as_string"] = {'type': 'string'}
     schema_entrypoint["apv_sequence_number"] = {'type': 'integer'}
 
 
 def _protobuf_to_js(module_name):
     """
-    Converts a protobuf to jsonschema
+    Converts a protobuf to jsonschema and returns the generated schema as a JSON object.
     """
     pf = "{0}/{1}.proto".format(OUTPUT_DIR, module_name)
     cmd = ["protobuf-jsonschema", pf]
@@ -105,7 +106,8 @@ def _register_jsonschema(js_schema, model_id):
 def _register_proto(proto_name, model_id):
     """
     Makes a proto file "known" to this viz
-    Later this would get done on demand when an unknown message type comes in by quering the catalog with the model_id
+    Later this would get done on demand when an unknown message type comes in 
+    by querying the catalog with the model_id.
     """
     from acumos_proto_viewer import data
 
@@ -122,7 +124,7 @@ def _register_proto(proto_name, model_id):
         data.proto_data_structure[model_id]["messages"][key.split(
             ".")[1]] = {"properties": j_schema["definitions"][key]["properties"]}
 
-    _logger.debug("Cooresponding JSON schema is: ")
+    _logger.debug("Corresponding JSON schema is: ")
     _logger.debug(json.dumps(j_schema))
 
 
@@ -133,7 +135,7 @@ def _proto_url_to_model_id(url):
 
 def _wget_proto(url, model_id):
     """
-    Used to download the proto files
+    Downloads proto files from the specified URL for the specified message (model).
     """
     fname = model_id + ".proto"
     _logger.debug("Attempting to download {0}".format(url))
@@ -166,10 +168,13 @@ def _wget_jsonschema(url, model_id):
 def _register_schema_from_url(url, schema_type, model_id):
     """
     Makes a proto file or jsonschema file known to this probe by a URL.
-    The term URL here is overloaded. When the probe runs in certain scenarios, for example when it talks to the Acumos model connector, it is not given a full URl in the POST.
-    Instead, in that scenario, it is given a partial URL, and the prefix is given when the probe is deployed as an ENV variable under "NEXUSENDPOINTURL".
-    This function handles both cases: when it recieves a full URL, and when it recieves a partial.
-    If it is not given a full URL, AND that NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable
+    The term URL here is overloaded. When the probe runs in certain scenarios, 
+    for example when it talks to the Acumos model connector, it is not given a 
+    full URl in the POST. Instead, in that scenario, it is given a partial URL, 
+    and the prefix is given (deployment configuration) as an ENV variable named 
+    "NEXUSENDPOINTURL". This function handles both cases: when it receives a full 
+    URL, and when it receives a partial. If it is not given a full URL, AND that 
+    NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable
     """
     # short circut if already registered
     if _check_model_id_already_registered(model_id):

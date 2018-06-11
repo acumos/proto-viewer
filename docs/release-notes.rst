@@ -25,6 +25,10 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.5.1] - 6/11/18
+
+- Change "recieved" to "received" in probe's metadata key
+
 [1.5.0] - 4/24/18
 
 - Add table option to view data in rows and columns
