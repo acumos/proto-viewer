@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "d0a0916d_785b3339",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-14T14:32:04Z",
+      "side": 1,
+      "message": "Yeah you have a TON of lines \u003e 80 char.",
+      "parentUuid": "be806d5e_b9db3a78",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1848c31d_f9b6c883",
         "filename": "acumos_proto_viewer/utils.py",
         "patchSetId": 5
@@ -47,6 +65,24 @@
       "writtenOn": "2018-06-14T11:03:38Z",
       "side": 1,
       "message": "there is a typo in this line as well, sorry about that \u003d)",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14e9549b_eda0cf8e",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-14T14:32:04Z",
+      "side": 1,
+      "message": "Next time just fix it! it\u0027s easy to edit for little changes like this right from the Gerrit interface",
+      "parentUuid": "1848c31d_f9b6c883",
       "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
