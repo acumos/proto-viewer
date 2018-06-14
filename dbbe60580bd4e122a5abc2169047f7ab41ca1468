@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "083d4b83_c4267d47",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-14T11:03:38Z",
+      "side": 1,
+      "message": "thanks..",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be806d5e_b9db3a78",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-14T11:03:38Z",
+      "side": 1,
+      "message": "this change is fine with me, just noting that the original formatting of the code here was done by autopep as pylint (and PEP) complains about lines \u003e 80. that\u0027s how it got like that. That is the one PEP I ignore though \u003d)",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1848c31d_f9b6c883",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-14T11:03:38Z",
+      "side": 1,
+      "message": "there is a typo in this line as well, sorry about that \u003d)",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1df83b9_1d362a21",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-14T11:03:38Z",
+      "side": 1,
+      "message": "nice, thanks.",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "15f682f1_31f51c2b",
+        "filename": "docs/release-notes.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-14T11:03:38Z",
+      "side": 1,
+      "message": "lol",
+      "revId": "dbbe60580bd4e122a5abc2169047f7ab41ca1468",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
