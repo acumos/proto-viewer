@@ -59,6 +59,12 @@ The following steps set up a development environment without use of Docker.
 
     export NEXUSENDPOINTURL=http://nexus.domain.com/repository/repo
 
+We have used a shared Nexus registry for this; any web server is is fine.  To use the fake-data injector the server must have these test files::
+
+    probe_testxyz_100_proto
+    probe_testimage_100_proto
+    image_mood_classification_100_proto
+
 7. Launch the Bokeh-enabled web server::
 
     ./apv36/bin/python3 bin/run.py
@@ -66,6 +72,12 @@ The following steps set up a development environment without use of Docker.
 8. Start the data-injection script::
 
     ./apv36/bin/python3 fake_data.py
+
+9. Open a web browser::
+
+    http://localhost:5006
+
+Never ever try to change the port. It will not work. It will evolve to endless suffering. Darkness will envelop you.  Essentially there's a bug in Bokeh.
 
 Dependencies
 ============
