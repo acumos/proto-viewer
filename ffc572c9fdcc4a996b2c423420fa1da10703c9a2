@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "25d7d53c_6b1f4255",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-27T11:12:45Z",
+      "side": 1,
+      "message": "LOL not sure this was intended for here but I accept.",
+      "revId": "ffc572c9fdcc4a996b2c423420fa1da10703c9a2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
