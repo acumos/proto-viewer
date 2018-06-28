@@ -91,6 +91,46 @@ If you are running locally, you will need to have :
 
 [1] This Docker container runs Nginx, Redis, and Bokeh. At one point I was told the probe had to be a single Docker container.
 
+Design
+======
+
+The proto-viewer enables viewing of binary-encoded protocol buffer messages 
+passed among elements of a composite solution. To display message content
+the proto-viewer must parse the binary message using a protocol buffer message 
+definition file. Those files are obtained dynamically by the proto-viewer 
+from network sources.
+
+Messages are passed to the proto-viewer by the Acumos blueprint orchestrator
+component, also known as the model connector.  The model connector makes HTTP POST 
+calls to deliver a copy of each message to the proto-viewer along with details 
+about the message definition.
+
+Each message POST-ed to the proto-viewer must contain only binary Protocol-Buffer
+encoded content, and must include the following HTTP headers::
+
+    PROTO-URL
+    Message-Name
+
+The "PROTO-URL" parameter can be either a complete URL (e.g., "http://host:port/path/to/file")
+or just a suffix (e.g., "/path/to/file").  The URL is used to fetch the protocol 
+buffer specification file for the message.  The "Message-Name" parameter specifies the 
+name of the message (data structure) within that protocol buffer specification file, 
+which may define multiple messages.
+
+If the PROTO-URL header parameter is just a suffix, the value of this environment 
+variable is consulted::
+
+    NEXUSENDPOINTURL
+
+This is expected to contain the prefix of a URL where the protocol buffer file can be
+obtained; e.g., "http://host:port/context/path".
+
+The proto-viewer invokes the "protoc" compiler to generate a Python module from each protocol 
+buffer message definition file.  This work is done in a temporary directory.  Then the proto-viewer 
+imports the newly created Python module and uses it to parse binary messages. One complication 
+is that the protoc tool fails for input files with a dot or hyphen in the filename, so the 
+filenames are mangled by the proto-viewer to remove all offending characters.
+
 Data Retention
 ==============
 
