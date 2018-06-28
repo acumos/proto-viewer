@@ -32,7 +32,8 @@ The following steps set up a development environment without use of Docker.
 0. Install prerequisites locally so they can be invoked by the probe:
 
     a. The protocol buffer compiler ("protoc"), version 3.5 or later
-    b. The protobuf-jsonschema tool, version 1.1.1 or later
+    b. The `npm` tool, version 2.15.5 or later
+    c. The `npm` package `protobuf-jsonschema`, version 1.1.1 or later (`npm install protobuf-jsonschema`)
 
 1. Obtain the set of test data (messages and image files) from the original developer and unpack to the /tmp directory.  You should have a file /tmp/1.png and so on.
 
@@ -59,7 +60,7 @@ The following steps set up a development environment without use of Docker.
 
     export NEXUSENDPOINTURL=http://nexus.domain.com/repository/repo
 
-We have used a shared Nexus registry for this; any web server is is fine.  To use the fake-data injector the server must have these test files::
+We have used a shared Nexus registry for this; any web server is fine.  To use the fake-data injector the server must have these test files::
 
     probe_testxyz_100_proto
     probe_testimage_100_proto
@@ -82,14 +83,55 @@ Never ever try to change the port. It will not work. It will evolve to endless s
 Dependencies
 ============
 
-If you are running in Docker, there are no external dependencies, it is,
-for better or worse[1], totally self contained.
+If you are running in Docker there are no external dependencies, for better or worse[1] it is totally self contained.
 
-If you are running locally, you will need to have :
-1. redis running on the standard port, reachable from **localhost**
-2. you will also need an `npm` package: `npm install protobuf-jsonschema`.
+If you are running locally, please follow the quickstart above.
 
-[1] This Docker container runs Nginx, Redis, and Bokeh. At one point I was told the probe had to be a single Docker container.
+[1] This Docker container runs Nginx, Redis, and Bokeh. The original requirements stated that the probe had to be a single Docker container.
+
+Design
+======
+
+The proto-viewer enables viewing of binary-encoded protocol buffer messages
+passed among elements of a composite solution. To display message content
+the proto-viewer must parse the binary message using a protocol buffer message
+definition file. Those files are obtained dynamically by the proto-viewer
+from network sources.
+
+Messages are passed to the proto-viewer by the Acumos blueprint orchestrator
+component, also known as the model connector.  The model connector makes HTTP POST
+calls to deliver a copy of each message to the proto-viewer along with details
+about the message definition.
+
+Each message POST-ed to the proto-viewer must contain only binary Protocol-Buffer
+encoded content, and must include the following HTTP headers::
+
+    PROTO-URL
+    Message-Name
+
+The "PROTO-URL" parameter can be either a complete URL (e.g., "http://host:port/path/to/file")
+or just a suffix (e.g., "/path/to/file").  The URL is used to fetch the protocol
+buffer specification file for the message.  The "Message-Name" parameter specifies the
+name of the message (data structure) within that protocol buffer specification file,
+which may define multiple messages.
+
+If the PROTO-URL header parameter is just a suffix, the value of this environment
+variable is consulted::
+
+    NEXUSENDPOINTURL
+
+This is expected to contain the prefix of a URL where the protocol buffer file can be
+obtained; e.g., "http://host:port/context/path".
+
+When the probe is sent the URL of a protocol buffer definition file, the probe
+downloads the .proto file and caches it for reuse if the same URL is encountered
+again. One complication here is that the protoc tool fails for input files that
+contain a dot or hyphen in the filename, so the filenames are mangled by the
+proto-viewer to remove all offending characters.
+
+The probe then invokes the "protoc" compiler on the definition file to generate a
+Python module, working in a temporary directory.  Finally the proto-viewer imports
+the newly created Python module and uses it to parse binary messages.
 
 Data Retention
 ==============
