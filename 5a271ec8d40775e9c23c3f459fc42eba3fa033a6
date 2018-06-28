@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "78e2b36b_6c9494e7",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-28T18:15:16Z",
+      "side": 1,
+      "message": "This reminds me of a stack overflow post: https://stackoverflow.com/questions/184618/what-is-the-best-comment-in-source-code-you-have-ever-encountered",
+      "parentUuid": "6743cc8f_fdface78",
+      "range": {
+        "startLine": 80,
+        "startChar": 35,
+        "endLine": 80,
+        "endChar": 116
+      },
+      "revId": "5a271ec8d40775e9c23c3f459fc42eba3fa033a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ef3e3039_cbbcf443",
         "filename": "docs/developer-guide.rst",
         "patchSetId": 1
@@ -140,6 +164,23 @@
     },
     {
       "key": {
+        "uuid": "647d74b1_cd003674",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-28T18:15:16Z",
+      "side": 1,
+      "message": "might want to add a node about caching. If the probe gets the same protourl more than once, it only downloads it one time (first time) and it knows the second (or Nth) time that there is no need to download or run protoc again. \n\nthis could have a potentially bad consequence where if the proto file at the URL changed, becuase it won\u0027t be downloaded. However, I assume this never happens, because the proto file version is part of the URL, and the proto file should never change without changing the version.",
+      "revId": "5a271ec8d40775e9c23c3f459fc42eba3fa033a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa0236b4_96ac0aca",
         "filename": "docs/developer-guide.rst",
         "patchSetId": 1
@@ -151,6 +192,30 @@
       "writtenOn": "2018-06-28T16:16:34Z",
       "side": 1,
       "message": "mangled? severely mutilated, disfigured, damaged? really? While I appreciate the author\u0027s sense of humor, perhaps a better word choice would be \u0027parsed\u0027",
+      "range": {
+        "startLine": 132,
+        "startChar": 14,
+        "endLine": 132,
+        "endChar": 21
+      },
+      "revId": "5a271ec8d40775e9c23c3f459fc42eba3fa033a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ea08d78_4963d5a2",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-06-28T18:15:16Z",
+      "side": 1,
+      "message": "Parsed is wrong; It isn\u0027t being parsed, it is actually changed in possibly unpleasant ways. I\u0027m OK with mangled.",
+      "parentUuid": "fa0236b4_96ac0aca",
       "range": {
         "startLine": 132,
         "startChar": 14,
