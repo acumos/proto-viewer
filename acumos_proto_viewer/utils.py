@@ -17,7 +17,9 @@ def _gen_compiled_proto_path(model_id):
     """
     Generates the expected compiled proto path from a model_id
     """
-    return "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
+    path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
+    _logger.debug("_gen_compiled_proto_path: result is %s", path)
+    return path
 
 
 def _check_model_id_already_registered(model_id):
@@ -40,13 +42,14 @@ def _compile_proto(model_id):
     gen_module = _gen_compiled_proto_path(model_id)
 
     expected_proto = "{0}/{1}.proto".format(OUTPUT_DIR, model_id)
+    _logger.debug("_compile_proto: expected_proto is %s", expected_proto)
     if not isfile(expected_proto):
         _logger.error("Proto file {0} does not exist! {1} listing: {2}".format(
             expected_proto, OUTPUT_DIR, listdir(OUTPUT_DIR)))
         raise Exception("Proto file {0} does not exist".format(expected_proto))
 
     cmd = ["protoc", "--python_out", OUTPUT_DIR, model_id + ".proto"]
-    _logger.debug("Running CMD: {0}".format(" ".join(cmd)))
+    _logger.debug("_compile_proto: running CMD: %s", " ".join(cmd))
 
     # cwd works even in Docker, I was having issues with protoc and proto_path inside docker (permissioning??)
     p = Popen(cmd, stderr=PIPE, cwd=OUTPUT_DIR)
@@ -56,7 +59,7 @@ def _compile_proto(model_id):
             "A failure occurred while generating source code from protobuf: {}".format(err))
 
     if not isfile(gen_module):
-        _logger.error("pb2.py file did not get created! {0} listing: {1}".format(
+        _logger.error("Expected file {0} did not get created! {1} listing: {12}".format(gen_module, 
             OUTPUT_DIR, listdir(OUTPUT_DIR)))
         raise Exception(
             "An unknown failure occurred while generating Python module {}".format(gen_module))
@@ -66,6 +69,7 @@ def _load_module(module_name, path):
     """
     Imports and returns a module from path for Python 3.5+
     """
+    _logger.debug("_load_module: importing module name %s", module_name)
     spec = importlib.util.spec_from_file_location(module_name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -87,6 +91,7 @@ def _protobuf_to_js(module_name):
     """
     pf = "{0}/{1}.proto".format(OUTPUT_DIR, module_name)
     cmd = ["protobuf-jsonschema", pf]
+    _logger.debug("_protobuf_to_js: running CMD: %s", " ".join(cmd))
     p = Popen(cmd, stderr=PIPE, stdout=PIPE)
     out = p.stdout.read()
     return json.loads(out)
@@ -97,7 +102,7 @@ def _register_jsonschema(js_schema, model_id):
     Makes a jsonschema known to this viz
     """
     from acumos_proto_viewer import data
-    _logger.info("Registering jsonschema %s", model_id)
+    _logger.info("Registering jsonschema {0}".format(model_id))
     data.jsonschema_data_structure[model_id] = {}
     _inject_apv_keys_into_schema(js_schema["properties"])
     data.jsonschema_data_structure[model_id]["json_schema"] = js_schema
@@ -124,44 +129,46 @@ def _register_proto(proto_name, model_id):
         data.proto_data_structure[model_id]["messages"][key.split(
             ".")[1]] = {"properties": j_schema["definitions"][key]["properties"]}
 
-    _logger.debug("Corresponding JSON schema is: ")
+    _logger.debug("_register_proto: corresponding JSON schema is: ")
     _logger.debug(json.dumps(j_schema))
 
 
 def _proto_url_to_model_id(url):
     # protoc cannot handle filenames with . in it!. It also renames "-" to "_"
-    return url.split("/")[-1].replace(".", "").replace("-", "_")
+    model_id = url.split("/")[-1].replace(".", "").replace("-", "_")
+    _logger.debug("_proto_url_to_model_id: result is %s", model_id)
+    return model_id
 
 
 def _wget_proto(url, model_id):
     """
-    Downloads proto files from the specified URL for the specified message (model).
+    Fetches a proto file from the specified URL for the specified message (model).
     """
     fname = model_id + ".proto"
-    _logger.debug("Attempting to download {0}".format(url))
+    _logger.debug("_wget_proto: attempting to download %s", url)
     r = requests.get(url)
     if r.status_code == 200:
         wpath = "{0}/{1}".format(OUTPUT_DIR, fname)
         with open(wpath, "w") as f:
             f.write(r.text)
-        _logger.debug("{0} succesfully downloaded to {1}, modeil_id = {2}".format(
+        _logger.debug("{0} successfully downloaded to {1}, model_id = {2}".format(
             url, wpath, model_id))
         return model_id, fname
     else:
-        _logger.error("Error: unable to reach {0}".format(url))
+        _logger.error("_wget_proto faileddr: unable to reach %s", url)
         raise SchemaNotReachable()
 
 
 def _wget_jsonschema(url, model_id):
     """
-    Used to download a JSON Schema file
+    Fetches a JSON Schema file from the specified URL and checks result
     """
-    _logger.debug("Attempting to download {0}".format(url))
+    _logger.debug("_wget_jsonschema: attempting to download %s", url)
     r = requests.get(url)
     if r.status_code == 200:
-        _logger.debug("{0} succesfully downloaded as {1}".format(url, model_id))
+        _logger.debug("{0} successfully downloaded as {1}".format(url, model_id))
         return json.loads(r.text)
-    _logger.error("Error: unable to reach {0}".format(url))
+    _logger.error("_wget_jsonschema failed: unable to reach %s", url)
     raise SchemaNotReachable()
 
 
@@ -176,15 +183,18 @@ def _register_schema_from_url(url, schema_type, model_id):
     URL, and when it receives a partial. If it is not given a full URL, AND that
     NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable.
     """
+    _logger.debug("_register_schema_from_url: checking model_id %s", model_id)
     # short circut if already registered
     if _check_model_id_already_registered(model_id):
         return model_id
 
     if url.startswith("http"):
+        _logger.debug("_register_schema_from_url: complete URL, using %s", url)
         targeturl = url
     else:
         if "NEXUSENDPOINTURL" in environ:
             nexus_endpoint = environ["NEXUSENDPOINTURL"]
+            _logger.debug("_register_schema_from_url: partial URL, extending with %s", nexus_endpoint)
             if not nexus_endpoint.endswith("/"):
                 # I have been giving conflicting examples about whether this contains a trailing /, being safe here.
                 nexus_endpoint = nexus_endpoint + "/"
@@ -207,7 +217,7 @@ def _register_schema_from_url(url, schema_type, model_id):
 
 def register_proto_from_url(url):
     """
-    Register a proto file from a URL
+    Registers a proto file from a URL
     """
     model_id = _proto_url_to_model_id(url)
     return _register_schema_from_url(url, "proto", model_id)
@@ -215,20 +225,21 @@ def register_proto_from_url(url):
 
 def register_jsonschema_from_url(url, topic_name):
     """
-    Register a jsonschema from a URL
-    Use topic_name as model_id
+    Registers a jsonschema from a URL
+    Uses topic_name as model_id
     """
     return _register_schema_from_url(url, "jsonschema", topic_name)
 
 
 def load_proto(model_id, cache={}):
     """
-    Load a protobuf module and return it
+    Loads a protobuf module and returns it
     Memoizes
     """
     if model_id in cache:
         return cache[model_id]
     expected_path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
+    _logger.debug("load_proto: checking cache path %s", expected_path)
     module = _load_module(model_id, expected_path)
     cache[model_id] = module
     return module

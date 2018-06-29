@@ -33,6 +33,7 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
     But we don't want that because that breaks images that arrive as raw bytes. So
     this preserves byte fields. Also it injects values for well-known probe fields.
     """
+    _logger.debug("_msg_to_json_preserve_bytes: model_id %s, message %s", model_id, message_name)
     mod = load_proto(model_id)
     msg = getattr(mod, message_name)()
     msg.ParseFromString(binarydata)

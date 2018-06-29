@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='acumos_proto_viewer',
-    version='1.5.1',
+    version='1.5.2',
     packages=find_packages(),
     author="Tommy Carpenter",
     author_email="tommy@research.att.com",
-    description="Probe for acumos and ONAP to display Ms's data",
+    description="Probe for Acumos and ONAP to display protobuf message content",
     license="Apache 2.0",
     keywords="",
     url="https://gerrit.acumos.org/r/#/admin/projects/proto-viewer",
