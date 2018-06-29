@@ -16,17 +16,16 @@ from jinja2 import Environment, FileSystemLoader
 from tornado.web import RequestHandler
 from acumos_proto_viewer import data, get_module_logger
 from acumos_proto_viewer.run_handlers import MODEL_SELECTION, MESSAGE_SELECTION, GRAPH_SELECTION, GRAPH_OPTIONS, AFTER_MODEL_SELECTION, FIGURE_MODEL, FIELD_SELECTION, IMAGE_MIME_SELECTION, IMAGE_SELECTION, MIME_SELECTION, DEFAULT_UNSELECTED, X_AXIS_SELECTION, Y_AXIS_SELECTION, COLUMN_MULTISELECT, COLUMN_SELECTION
-
 from acumos_proto_viewer import run_handlers
 
+_logger = get_module_logger(__name__)
 
 # read params from env variables
 CBF = int(os.environ["UPDATE_CALLBACK_FREQUENCY"]) if "UPDATE_CALLBACK_FREQUENCY" in os.environ else 1000  # default to 1s
+_logger.debug("run: using callback frequency %d ms", CBF)
 SUPPORTED_MIME_TYPES = ["png", "jpeg"]
 _host = None  # magic that will be used to return the correct image url even when in Docker; will be set to the request uri to /. If they can hit whatever:/, then they can hit whatever/data etc
 _last_callback = None
-
-_logger = get_module_logger(__name__)
 
 class IndexHandler(RequestHandler):
     """handler for /"""
@@ -355,9 +354,7 @@ def modify_doc(doc):
 
     # construct what the user will see
     selec = widgetbox([modelselec])
-
     doc.add_root(selec)
-
     doc.theme = Theme(filename="theme.yaml")
 
 # Setting num_procs here means we can't touch the IOLoop before now, we must
