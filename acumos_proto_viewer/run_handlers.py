@@ -1,7 +1,8 @@
 import hashlib
-from acumos_proto_viewer import data
+from acumos_proto_viewer import data, get_module_logger
 from acumos_proto_viewer.exceptions import SchemaNotReachable
 
+_logger = get_module_logger(__name__)
 
 # Constants used in the GUI to name bokeh models
 DEFAULT_UNSELECTED = "Please Select"
@@ -62,6 +63,8 @@ def handle_data_post(headers, req_body):
     """
     proto_url = headers.get("PROTO-URL", None)  # the weird casing on these were told to me by the model connector team
     message_name = headers.get("Message-Name", None)
+    # this level of chattiness is not desirable for typical use
+    # _logger.debug("handle_data_post: proto_url %s message_name %s", proto_url, message_name)
     if (proto_url is None or message_name is None):
         return 400, "Error: PROTO-URL or Message-Name header missing."
     try:
@@ -70,6 +73,7 @@ def handle_data_post(headers, req_body):
         # that I should return the request body that I received
         return 200, req_body
     except SchemaNotReachable:
+        _logger.error("handle_data_post: failed to download def for url %s", proto_url)
         return 400, "Error: {0} was not downloadable!".format(proto_url)
 
 
@@ -80,10 +84,13 @@ def handle_onap_mr_put(headers, topic_name):
     server_hostname = headers.get("server-hostname")
     server_port = headers.get("server-port")
     schema_url = headers.get("schema-url")
+    # this level of chattiness is not desirable for typical use
+    # _logger.debug("handle_onap_mr_put: server_hostname %s port %s schema url %s", server_hostname, server_port, schema_url)
     if (server_hostname is None or server_port is None or schema_url is None):
         return 400, "Error: Required header missing."
     try:
         url = "http://{0}:{1}/events/{2}".format(server_hostname, server_port, topic_name)
+        _logger.debug("handle_onap_mr_put: constructed URL %s", url)
         data.setup_mr_subscription(url, schema_url, topic_name)
     except SchemaNotReachable:
         return 400, "Error: {0} was not downloadable!".format(schema_url)
