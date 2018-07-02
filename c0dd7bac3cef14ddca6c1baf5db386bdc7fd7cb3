@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f58c9da2_5bbfec44",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-07-02T13:04:13Z",
+      "side": 1,
+      "message": "I understand from you that protobuf files are fetched on first use and cached; so most of these should not be on every message, right?",
+      "parentUuid": "9b681cf6_ec6aabd8",
+      "revId": "c0dd7bac3cef14ddca6c1baf5db386bdc7fd7cb3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a904976a_a94d6adb",
         "filename": "setup.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2018-06-29T18:51:06Z",
       "side": 1,
       "message": "@lott you could add your name into here if you want. You have earned it \u003d)",
+      "revId": "c0dd7bac3cef14ddca6c1baf5db386bdc7fd7cb3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c152215_f5eaa916",
+        "filename": "setup.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-07-02T13:04:13Z",
+      "side": 1,
+      "message": "I must respectfully decline your generous offer   :)",
+      "parentUuid": "a904976a_a94d6adb",
       "revId": "c0dd7bac3cef14ddca6c1baf5db386bdc7fd7cb3",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
