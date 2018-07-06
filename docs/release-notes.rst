@@ -26,34 +26,38 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
 [1.5.2] - 6/29/2018
+-------------------
 
 - Add debug logging statements to util functions
 
 [1.5.1] - 6/11/18
+-----------------
 
 - Change "recieved" to "received" in probe's metadata key
 
 [1.5.0] - 4/24/18
+-----------------
 
 - Add table option to view data in rows and columns
 
 [1.4.2] - 3/25/18
+-----------------
 
 - Make raw formatting work even with bytes by truncating them
 
 [1.4.1] - 3/25/18
--------
+-----------------
 
 - Slightly better raw formatting
 
 [1.4.0] - 3/25/18
--------
+-----------------
 
 - Handle "repeated" keyword
 - Better raw display
 
 [1.3.1] - 3/24/18
--------
+-----------------
 
 - Swap out marshal for pickle
 
@@ -145,7 +149,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
 -  Switch to a third party lib for parsing the proto file
 -  Move away from the proto file name being significant, to a notion of
-   “model id” instead
+   "model id" instead
 -  Support multiple connections
 
 [0.0.3]
