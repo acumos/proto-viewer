@@ -25,6 +25,12 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.5.3] - 7/9/2018
+------------------
+
+- Tell json converter to preserve protobuf names
+- Add debug log to inject_data
+
 [1.5.2] - 6/29/2018
 -------------------
 
