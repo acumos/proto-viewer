@@ -216,7 +216,8 @@ def _register_schema_from_url(url, schema_type, model_id):
 
 def register_proto_from_url(url):
     """
-    Registers a proto file from a URL
+    Registers a proto file from a URL.
+    Raises SchemaNotReachable if the URL is invalid.
     """
     model_id = _proto_url_to_model_id(url)
     return _register_schema_from_url(url, "proto", model_id)
