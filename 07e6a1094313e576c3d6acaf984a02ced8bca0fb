@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "201793dd_1f51d3c8",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-07-09T19:18:25Z",
+      "side": 1,
+      "message": "omg",
+      "revId": "07e6a1094313e576c3d6acaf984a02ced8bca0fb",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9b3bf230_e0a7d650",
+        "filename": "docs/release-notes.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-07-09T19:18:25Z",
+      "side": 1,
+      "message": "do you want to update this with the proto flag change?",
+      "revId": "07e6a1094313e576c3d6acaf984a02ced8bca0fb",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
