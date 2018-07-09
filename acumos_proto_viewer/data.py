@@ -114,6 +114,7 @@ def get_raw_data(model_id, message_name, index_start, index_end):
 def inject_data(binarydata, proto_url, message_name):
     """
     Injects data into the appropriate queue.
+    Raises SchemaNotReachable if the proto_url is invalid.
     In the future if the data moves to a database this would go away
     """
     # register the proto file. Will return immediately if already exists
@@ -121,22 +122,24 @@ def inject_data(binarydata, proto_url, message_name):
 
     size = get_raw_data_source_size(model_id, message_name)
     index = _get_raw_data_source_index(model_id, message_name)
+    _logger.debug("inject_data: message_name %s sequence %d", message_name, size + 1)
     m = _msg_to_json_preserve_bytes(binarydata, model_id, message_name, size + 1)
     # safeguard against malformed data
-    if sorted(m.keys()) == sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys()):
+    act_keys = sorted(m.keys())
+    exp_keys = sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys())
+    if act_keys == exp_keys:
         # this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
         try:
             pickled_message = pickle.dumps(m)
             myredis.rpush(index, pickled_message)
         except Exception as exc:
-            _logger.error("Could not pickle data or upload it to redis")
+            _logger.error("inject_data: failed to pickle data or upload it to redis")
             _logger.exception(exc)
         if size == 0:
-            _logger.debug("Created new data source and setting a TTL of one day")
+            _logger.debug("inject_data: created new data source with TTL of one day")
             myredis.expire(index, 60 * 60 * 24)
     else:
-        _logger.debug("Data dropped! {0} compared to {1}".format(m.keys(), sorted(
-            proto_data_structure[model_id]["messages"][message_name]["properties"].keys())))
+        _logger.debug("inject_data: dropped message due to unexpected keys: received {0} expected {1}".format(act_keys, exp_keys))
 
 
 def delete_mr_subscription(topic_name):
