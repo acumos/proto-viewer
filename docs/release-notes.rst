@@ -28,7 +28,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 [1.5.3] - 7/9/2018
 ------------------
 
-- Tell json converter to preserve protobuf names
+- Tell json converter to preserve protobuf names (ACUMOS-1366)
 - Add debug log to inject_data
 
 [1.5.2] - 6/29/2018
