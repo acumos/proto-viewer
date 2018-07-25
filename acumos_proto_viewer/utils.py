@@ -176,7 +176,7 @@ def _register_schema_from_url(url, schema_type, model_id):
     Makes a proto file or jsonschema file known to this probe by a URL.
     The term URL here is overloaded. When the probe runs in certain scenarios,
     for example when it talks to the Acumos model connector, it is not given a
-    full URl in the POST. Instead, in that scenario, it is given a partial URL,
+    full URL in the POST. Instead, in that scenario, it is given a partial URL,
     and the prefix is given (deployment configuration) as an ENV variable named
     "NEXUSENDPOINTURL". This function handles both cases: when it receives a full
     URL, and when it receives a partial. If it is not given a full URL, AND that
