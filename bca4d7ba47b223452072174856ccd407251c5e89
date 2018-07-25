@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4c84435f_ff81bcb5",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-07-25T20:05:28Z",
+      "side": 1,
+      "message": "gotta give you credit for ATD!",
+      "revId": "bca4d7ba47b223452072174856ccd407251c5e89",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f60a1935_7e02ceea",
+        "filename": "bin/fake_data.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-07-25T20:05:28Z",
+      "side": 1,
+      "message": "this is pretty weird. Underscored methods are private, so if the goal is to use this as a public function, maybe we should make _load_module into load_module. Because this looks like a violation by using a private method.",
+      "revId": "bca4d7ba47b223452072174856ccd407251c5e89",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "596b5886_6e03d73a",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-07-25T20:05:28Z",
+      "side": 1,
+      "message": "possibly 3.6+; 3.7 is out. we could test it by adding 3.7 into the tox. homebrew decided to make my system python 3.7 already.",
+      "revId": "bca4d7ba47b223452072174856ccd407251c5e89",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6579bf08_417586e4",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-07-25T20:05:28Z",
+      "side": 1,
+      "message": "oooh I see, it automatically hosts the files, nice, fancy. well done",
+      "revId": "bca4d7ba47b223452072174856ccd407251c5e89",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
