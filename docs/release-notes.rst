@@ -25,6 +25,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.5.4] - 7/26/2018
+-------------------
+
+- Add test data
+- Add directions for running web server to publish test data
+- Revise utils.py to expose load_module function
+- Revise bin/fake_data.py to call test data using simple paths
+
 [1.5.3] - 7/9/2018
 ------------------
 
