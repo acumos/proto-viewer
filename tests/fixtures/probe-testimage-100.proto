@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package whatisthisforagain;
+
+message TransformedImagePNG {
+   bytes imagebinary = 1;
+}
+
+message TransformedImageJPEG {
+   bytes imagebinary = 1;
+}

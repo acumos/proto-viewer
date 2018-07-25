@@ -64,17 +64,6 @@ def _compile_proto(model_id):
             "An unknown failure occurred while generating Python module {}".format(gen_module))
 
 
-def _load_module(module_name, path):
-    """
-    Imports and returns a module from path for Python 3.5+
-    """
-    _logger.debug("_load_module: importing module name %s", module_name)
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def _inject_apv_keys_into_schema(schema_entrypoint):
     """
     Injects well-known proto-viewer keys into a jsonschema.
@@ -176,7 +165,7 @@ def _register_schema_from_url(url, schema_type, model_id):
     Makes a proto file or jsonschema file known to this probe by a URL.
     The term URL here is overloaded. When the probe runs in certain scenarios,
     for example when it talks to the Acumos model connector, it is not given a
-    full URl in the POST. Instead, in that scenario, it is given a partial URL,
+    full URL in the POST. Instead, in that scenario, it is given a partial URL,
     and the prefix is given (deployment configuration) as an ENV variable named
     "NEXUSENDPOINTURL". This function handles both cases: when it receives a full
     URL, and when it receives a partial. If it is not given a full URL, AND that
@@ -231,6 +220,17 @@ def register_jsonschema_from_url(url, topic_name):
     return _register_schema_from_url(url, "jsonschema", topic_name)
 
 
+def load_module(module_name, path):
+    """
+    Imports and returns a module from path for Python 3.5+.
+    """
+    _logger.debug("_load_module: importing module name %s", module_name)
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def load_proto(model_id, cache={}):
     """
     Loads a protobuf module and returns it
@@ -240,6 +240,6 @@ def load_proto(model_id, cache={}):
         return cache[model_id]
     expected_path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
     _logger.debug("load_proto: checking cache path %s", expected_path)
-    module = _load_module(model_id, expected_path)
+    module = load_module(model_id, expected_path)
     cache[model_id] = module
     return module
