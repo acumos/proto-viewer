@@ -31,11 +31,14 @@ The following steps set up a development environment without use of Docker.
 
 0. Install prerequisites locally so they can be invoked by the probe:
 
-    a. The protocol buffer compiler ("protoc"), version 3.5 or later
-    b. The `npm` tool, version 2.15.5 or later
-    c. The `npm` package `protobuf-jsonschema`, version 1.1.1 or later (`npm install protobuf-jsonschema`)
+    a. Python version 3.6, ideally in a virtual environment
+    b. The protocol buffer compiler ("protoc"), version 3.5 or later
+    c. The `npm` tool, version 2.15.5 or later
+    d. The `npm` package `protobuf-jsonschema`, version 1.1.1 or later (`npm install protobuf-jsonschema`)
 
-1. Obtain the set of test data (messages and image files) from the original developer and unpack to the /tmp directory.  You should have a file /tmp/1.png and so on.
+1. Clone the proto-viewer repository (which you probably already have done, since you're reading this)::
+
+    git clone https://gerrit.acumos.org/r/proto-viewer
 
 2. Download and build the redis server on the development machine, then start it:
 
@@ -43,28 +46,24 @@ The following steps set up a development environment without use of Docker.
 
     src/redis-server --daemonize yes
 
-3. Clone the proto-viewer repository::
-
-    git clone https://gerrit.acumos.org/r/proto-viewer
-
-4. Create a virtual environment with Python 3.6 (version 3.5 may not work, use 3.6) locally::
+3. Create a virtual environment with Python 3.6 (version 3.5 may not work, use 3.6) locally::
 
     virtualenv -p python3.6 apv36
 
-5. Use the virtual environment to install this package::
+The name "apv36" is not magic, but will be used in all of the following directions.
+
+4. Use the virtual environment to install this package::
 
     ./apv36/bin/pip install -r requirements.txt
     ./apv36/bin/pip install .
 
-6. Set an environment variable with the URL of the Nexus server that has the required protobuf files::
+5. Start a trivial Python server to publish the protocol buffer definition files, it uses port 8000 by default::
 
-    export NEXUSENDPOINTURL=http://nexus.domain.com/repository/repo
+    cd tests/fixtures; ../../apv36/bin/python3 -m http.server
 
-We have used a shared Nexus registry for this; any web server is fine.  To use the fake-data injector the server must have these test files::
+6. Set an environment variable with the URL of the little python server that has the required protobuf files::
 
-    probe_testxyz_100_proto
-    probe_testimage_100_proto
-    image_mood_classification_100_proto
+    export NEXUSENDPOINTURL=http://localhost:8000
 
 7. Launch the Bokeh-enabled web server::
 
