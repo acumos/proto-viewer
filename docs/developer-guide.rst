@@ -187,19 +187,6 @@ You can also pass in the following to alter the run behavior:
    second) of the callbacks that update the graphs on the screen, e.g.,
 
 
-Fake data
-=========
-
-To launch a script that generates fake data and sends it:
-
-.. code:: bash
-
-    fake_data.py [host:port]
-
-**[host:port]** is an optional cmd line argument giving the target proto
-to send data to; it defaults to **localhost:5006** for local
-development.
-
 Extra Fields
 ============
 
@@ -212,3 +199,72 @@ injected, by this server, with additional keys:
    model, used for plotting the raw text if the user chooses
 3. **apv_sequence_number**: the sequence number of this “type” of raw
    data, where type = (model_id, message_name)
+
+
+Testing
+=======
+
+The proto-viewer can be tested standalone; i.e., without deploying a composite
+solution to any cloud environment.  Follow the development quickstart instructions
+above to install prerequisites and start the necessary servers.  Then use the 
+data-generation script described next.
+
+Data Injector
+-------------
+
+A Python script is provided to generate and send data to the probe.  The name is
+"fake_data.py" and it can be found in the bin subdirectory.  Launch the script like this:
+
+.. code:: bash
+
+    fake_data.py [host:port]
+
+**[host:port]** is an optional cmd line argument giving the target proto
+to send data to; it defaults to **localhost:5006** for local development.
+
+Test Messages
+-------------
+
+The test script creates and sends messages continually.  Those messages are cached within
+the running Redis server.  The following message types are used:
+
+1. image-mood-classification-100.
+   This message carries an array of objects including an image.
+2. probe-testimage-100
+   This message carries a single image.
+    Use this to test display of an image.
+3. probe-testnested-100
+   This message has a hierarchical message; i.e., an inner complex object within an outer complex object.
+   Use this to test selection of nested fields.
+4. probe-testxyz-100
+   This message carries several numeric and string values.
+   Use this to test plotting x, y values on various graphs.
+
+
+Expected Behavior
+-----------------
+
+Use a web browser to visit the proto-viewer with the appropriate host and port, the default URL is the following::
+
+    http://localhost:5006
+    
+Upon browsing to this URL a page like the following should load:
+
+ |img-probe-start|
+
+After the data-injection script has sent a few data points, follow these steps to view a plot of data
+that arrives in a nested message:
+
+1. In the Model Selection drop-down, pick item "protobuf_probe_testnested_100proto"
+2. In the Message Selection drop-down, pick item "NestOuter"
+3. In the Graph Selection drop-down, pick item "scatter"
+4. In the X axis drop-down, pick item "i.x : {'type': 'number'}
+5. In the Y axis drop-down, pick item "i.y : {'type': 'number'}
+
+The page should change to resemble the following:
+
+ |img-probe-plot|
+
+
+.. |img-probe-start| image:: probe-start.png
+.. |img-probe-plot|  image:: probe-plot.png

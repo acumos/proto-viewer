@@ -54,7 +54,7 @@ def test_inject_data_env(monkeypatch, monkeyed_requests_get, cleanuptmp, fake_ms
     # patching
     data.myredis = fakeredis.FakeStrictRedis()
     monkeypatch.setattr(
-        'acumos_proto_viewer.data.get_raw_data_source_size', lambda x, y: 0)
+        'acumos_proto_viewer.data.get_raw_data_source_count', lambda x, y: 0)
     monkeypatch.setattr(
         'acumos_proto_viewer.data._get_bucket', lambda: 'asdf0')
     monkeypatch.setattr('time.time', lambda: 55555555555)
@@ -76,7 +76,7 @@ def test_inject_data(monkeypatch, monkeyed_requests_get, cleanuptmp, fake_msg, f
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
     data.myredis = fakeredis.FakeStrictRedis()
     monkeypatch.setattr(
-        'acumos_proto_viewer.data.get_raw_data_source_size', lambda x, y: 0)
+        'acumos_proto_viewer.data.get_raw_data_source_count', lambda x, y: 0)
     monkeypatch.setattr(
         'acumos_proto_viewer.data._get_bucket', lambda: 'asdf0')
     monkeypatch.setattr('time.time', lambda: 55555555555)
