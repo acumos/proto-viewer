@@ -1,5 +1,5 @@
 from types import ModuleType
-from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _protobuf_to_js
+from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _protobuf_to_js, get_message_data
 from acumos_proto_viewer import data
 
 
@@ -138,3 +138,17 @@ def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
         }
     })
     cleanuptmp()
+
+
+def test_get_message_data():
+    # Protobuf converted to JSON looks like this
+    pbmsg = {
+        "i": 1,
+        "j": 2,
+        "k": {
+            "x": 3,
+            "y": 4
+        }
+    }
+    assert 1 == get_message_data(pbmsg, "i")
+    assert 3 == get_message_data(pbmsg, "k.x")

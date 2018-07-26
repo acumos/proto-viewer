@@ -1,4 +1,4 @@
-<!---
+/*
   ===============LICENSE_START=======================================================
   Acumos Apache-2.0
   ===================================================================================
@@ -16,21 +16,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   ===============LICENSE_END=========================================================
--->
+ */
 
-{% block postamble %}
-  <title>Proto Viewer -- Acumos</title>
-  <style>
-    {% include 'acumos-proto-viewer.css' %}
-  </style>
-{% endblock %}
 
-{% block contents %}
-  <div class="content">
-	<h2>Acumos Proto Viewer</h2>
-	<p>
-	This viewer shows the content of protocol buffer messages within a composite solution.
-	</p>
-	{{ script|safe }}
-  </div>
-{% endblock %}
+html {
+    width: 100%;
+}
+body {
+    min-width: 600px;
+    max-width: 900px;
+    width: 75%;
+    margin: auto;
+    font-family: sans-serif;
+    font-size: 100%;
+    color: #000;
+}
