@@ -15,6 +15,7 @@ from bokeh.io import curdoc
 from jinja2 import Environment, FileSystemLoader
 from tornado.web import RequestHandler
 from acumos_proto_viewer import data, get_module_logger
+from acumos_proto_viewer.utils import APV_MODEL, APV_RECVD, APV_SEQNO
 from acumos_proto_viewer.run_handlers import MODEL_SELECTION, MESSAGE_SELECTION, GRAPH_SELECTION, GRAPH_OPTIONS, AFTER_MODEL_SELECTION, FIGURE_MODEL, FIELD_SELECTION, IMAGE_MIME_SELECTION, IMAGE_SELECTION, MIME_SELECTION, DEFAULT_UNSELECTED, X_AXIS_SELECTION, Y_AXIS_SELECTION, COLUMN_MULTISELECT, COLUMN_SELECTION
 from acumos_proto_viewer import run_handlers
 
@@ -74,14 +75,16 @@ class ImageHandler(RequestHandler):
     """handler for /image"""
     def get(self, slug):
         """handler for GET /image"""
-        (model_id, message_name, field, mime, sind, index) = slug.split("---")
+        (model_id, message_name, field_name, mime, sind, index) = slug.split("---")
         self.set_header('Content-Type', 'image/' + mime)
-        raw_data_size = data.get_raw_data_source_size(model_id, message_name)
-        if raw_data_size > 0:
-            i = min(int(index), raw_data_size - 1)  # if session was logged in before midnight, raw data set might have reset and the session index is now greater; check for this edge case so we don't blow up
+        raw_data_count = data.get_raw_data_source_count(model_id, message_name)
+        if raw_data_count > 0:
+            i = min(int(index), raw_data_count - 1)  # if session was logged in before midnight, raw data set might have reset and the session index is now greater; check for this edge case so we don't blow up
             source = data.get_raw_data(model_id, message_name, i, i + 1)
             self.set_status(200)
-            self.write(source[0][field])
+            # field may be a dotted tuple
+            data = _get_message_data(source[0], field_name)
+            self.write(data)
         else:
             self.set_status(404)
         self.finish()
@@ -108,9 +111,9 @@ def _remove_callback(curdoc):
     if _last_callback is not None:
         try:
             curdoc.remove_periodic_callback(_last_callback)
-            _logger.info("Callback removed")
+            _logger.debug("_remove_callback: success")
         except Exception as exc:
-            _logger.debug(exc)
+            _logger.debug("_remove_callback failed: {0}".format(exc))
 
 
 def _install_callback_and_cds(sind, model_id, message_name, field_transforms={}, stream_limit=None):
@@ -130,36 +133,64 @@ def _install_callback_and_cds(sind, model_id, message_name, field_transforms={},
     global _last_callback
     _last_callback = func
     d.add_periodic_callback(func, CBF)
-    _logger.info("Callback {0} added for sind {1}".format(func, sind))
+    _logger.debug("_install_callback_and_cds: callback {0} added for sind {1}".format(func, sind))
+
+
+def _get_message_data(msg_dict, field_name):
+    """
+    Extracts message data using a field name, which may be a dotted tuple ("i.x").
+    Calls self on nested field names.  Returns none if field is not found.
+    """
+    if field_name in msg_dict:
+        return msg_dict[field_name]
+    index = field_name.find(".")
+    if index > 0:
+        prefix = field_name[:index]
+        suffix = field_name[index + 1:]
+        if prefix in msg_dict:
+            return _get_message_data(msg_dict[prefix], suffix)
+        else:
+            _logger.warning("_get_message_data: first component not found {0}".format(prefix))
+    # _logger.warning("_get_message_data: unknown field {0}".format(field_name))
+    return None
 
 
 ########
 # UPDATE CALLBACKS
 def _bokeh_periodic_update(sind, model_id, message_name, field_transforms={}, stream_limit=None):
     """
-    Callback that gets called periodically *for each session*. That is, each session (user connecting via browser) will register a callback of this for their session
+    Callback that gets called periodically *for each session*. That is, each session 
+    (user connecting via browser) will register a callback of this for their session.
     Here we will update the data source with new points
     https://bokeh.pydata.org/en/latest/docs/reference/models/sources.html
 
-    field_transoforms is a dict {k : [func, kwargs]} where func(k, **kwargs) will be applied for all k in the raw data before going into the column_data_source
+    field_transforms is a dict {k : [func, kwargs]} where func(k, **kwargs) will be 
+    applied for all k in the raw data before going into the column_data_source
 
     PLEASE READ ABOUT DATA REDUNDANCY:
         https://groups.google.com/a/continuum.io/forum/#!topic/bokeh/m91Y2La6fS0
-
     """
     d = curdoc()
     column_data_source = d.get_model_by_name(sind)
-    index = column_data_source.tags[0]
+    seq = column_data_source.tags[0]
+    # _logger.debug("_bokeh_periodic_update: model_id {0}, message {1}, seq {2}".format(model_id, message_name, seq))
     model_id, message_name, model_type = run_handlers.get_modelid_messagename_type(d)
-    source = data.get_raw_data(model_id, message_name, index, -1)
+    source = data.get_raw_data(model_id, message_name, seq, -1)
+    # _logger.debug("_bokeh_periodic_update: source length {0}".format(len(source)))
     if source != []:  # might be no data, exit callback immediately if so
+        # this has all the properties, even ones we don't want to display
+        # these keys may be dotted pairs
         sinit = {k: [] for k in run_handlers.get_model_properties(model_id, message_name, model_type)}
+        # _logger.debug("_bokeh_periodic_update: sinit {0}".format(sinit))
         newdata = sinit
         num_data = 0
-        for m in source:  # from where we left off to the end
+        for msg in source:  # from where we left off to the end
             for mk in sinit.keys():
-                val = m[mk]
-                if mk in field_transforms:
+                val = _get_message_data(msg, mk)
+                if val is None:
+                    pass # Ignore.  For example, model_as_string property is defined but not pushed to Redis.
+                    # _logger.warning("_bokeh_periodic_update: failed to get value from message {0}, field {1}".format(message_name, mk))
+                elif mk in field_transforms:
                     val = field_transforms[mk][0](val, **field_transforms[mk][1])
                 if isinstance(val, bytes):
                     # this can happen in rare cases, like RAW being used to try to display an image
@@ -171,7 +202,7 @@ def _bokeh_periodic_update(sind, model_id, message_name, field_transforms={}, st
 
         # Warning, don't check newdata = sinit because it's not a deep copy!!!!!11!
         d.get_model_by_name(sind).stream(newdata, stream_limit)  # after the data source is updated, some magic happens such that the new data is streamed via web socket to the browser
-        column_data_source.tags = [index + num_data]
+        column_data_source.tags = [seq + num_data]
 
 
 def modelselec_change():
@@ -218,16 +249,17 @@ def graphs_change():
     props = run_handlers.get_model_properties(model_id, message_name, model_type)
 
     if graph_val in ["line", "scatter", "step"]:
-        field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in "apv_model_as_string"]  # never want to plot this special string field
-        xselect = Select(title="X axis", value=DEFAULT_UNSELECTED, options=field_options + [DEFAULT_UNSELECTED], name=X_AXIS_SELECTION)
-        yselect = Select(title="Y axis", value=DEFAULT_UNSELECTED, options=field_options + [DEFAULT_UNSELECTED], name=Y_AXIS_SELECTION)
+        # never want to plot this special string field
+        field_options = ["{0} : {1}".format(k, props[k]) for k in props if not any(apv in k for apv in [ APV_MODEL ] ) ]
+        xselect = Select(title="X Axis", value=DEFAULT_UNSELECTED, options=field_options + [DEFAULT_UNSELECTED], name=X_AXIS_SELECTION)
+        yselect = Select(title="Y Axis", value=DEFAULT_UNSELECTED, options=field_options + [DEFAULT_UNSELECTED], name=Y_AXIS_SELECTION)
         xselect.on_change('value', lambda attr, old, new: make_2axis_graph())
         yselect.on_change('value', lambda attr, old, new: make_2axis_graph())
         d.add_root(column(Div(text=""), row(widgetbox([xselect]), widgetbox([yselect])), name=FIELD_SELECTION))
 
     if graph_val in ["image"]:
         # alter the field options for known non-image fields
-        field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in ["apv_received_at", "apv_sequence_number", "apv_model_as_string"]]
+        field_options = ["{0} : {1}".format(k, props[k]) for k in props if not any(apv in k for apv in [APV_RECVD, APV_SEQNO, APV_MODEL] ) ]
         imageselect = Select(title="Image Field", value=DEFAULT_UNSELECTED, options=[DEFAULT_UNSELECTED] + field_options, name=IMAGE_SELECTION)
         mimeselect = Select(title="MIME Type", value=DEFAULT_UNSELECTED, options=[DEFAULT_UNSELECTED] + SUPPORTED_MIME_TYPES, name=MIME_SELECTION)
         imageselect.on_change('value', lambda attr, old, new: image_selection_change())
@@ -237,7 +269,7 @@ def graphs_change():
     if graph_val in ["table"]:
         # TODO: limit selectable columns to whose of the same size (table height)
         # use just the field name; don't show properties in the multi-select box
-        col_options = [k for k in props if k not in ["apv_received_at", "apv_sequence_number", "apv_model_as_string"]]
+        col_options = [k for k in props if not any (apv in k for apv in [APV_RECVD, APV_SEQNO, APV_MODEL] ) ]
         columnmultiselect = MultiSelect(title="Columns:", value=[], options=col_options, name=COLUMN_MULTISELECT)
         columnmultiselect.on_change('value', lambda attr, old, new: column_selection_change())
         d.add_root(column(Div(text=""), widgetbox([columnmultiselect]), name=COLUMN_SELECTION))
@@ -267,11 +299,11 @@ def graphs_change():
 def image_selection_change():
     """Callback for changing the image field or mime field"""
 
-    def return_image(val, model_id, message_name, field, mime, sind):
+    def return_image(val, model_id, message_name, field_name, mime, sind):
         """Returns a URL resolvable by the probe"""
         column_data_source = curdoc().get_model_by_name(sind)
         index = column_data_source.tags[0]
-        url = "http://{0}/image/".format(_host) + "---".join([model_id, message_name, field, mime, sind, str(index)])
+        url = "http://{0}/image/".format(_host) + "---".join([model_id, message_name, field_name, mime, sind, str(index)])
         return url
 
     d = curdoc()
