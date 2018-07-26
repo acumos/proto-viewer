@@ -15,6 +15,7 @@ from bokeh.io import curdoc
 from jinja2 import Environment, FileSystemLoader
 from tornado.web import RequestHandler
 from acumos_proto_viewer import data, get_module_logger
+from acumos_proto_viewer.utils import APV_MODEL, APV_RECVD, APV_SEQNO
 from acumos_proto_viewer.run_handlers import MODEL_SELECTION, MESSAGE_SELECTION, GRAPH_SELECTION, GRAPH_OPTIONS, AFTER_MODEL_SELECTION, FIGURE_MODEL, FIELD_SELECTION, IMAGE_MIME_SELECTION, IMAGE_SELECTION, MIME_SELECTION, DEFAULT_UNSELECTED, X_AXIS_SELECTION, Y_AXIS_SELECTION, COLUMN_MULTISELECT, COLUMN_SELECTION
 from acumos_proto_viewer import run_handlers
 
@@ -74,14 +75,15 @@ class ImageHandler(RequestHandler):
     """handler for /image"""
     def get(self, slug):
         """handler for GET /image"""
-        (model_id, message_name, field, mime, sind, index) = slug.split("---")
+        (model_id, message_name, field_name, mime, sind, index) = slug.split("---")
         self.set_header('Content-Type', 'image/' + mime)
-        raw_data_size = data.get_raw_data_source_size(model_id, message_name)
-        if raw_data_size > 0:
-            i = min(int(index), raw_data_size - 1)  # if session was logged in before midnight, raw data set might have reset and the session index is now greater; check for this edge case so we don't blow up
+        raw_data_count = data.get_raw_data_source_count(model_id, message_name)
+        if raw_data_count > 0:
+            i = min(int(index), raw_data_count - 1)  # if session was logged in before midnight, raw data set might have reset and the session index is now greater; check for this edge case so we don't blow up
             source = data.get_raw_data(model_id, message_name, i, i + 1)
             self.set_status(200)
-            self.write(source[0][field])
+            # TODO: field may be a dotted tuple
+            self.write(source[0][field_name])
         else:
             self.set_status(404)
         self.finish()
@@ -218,7 +220,8 @@ def graphs_change():
     props = run_handlers.get_model_properties(model_id, message_name, model_type)
 
     if graph_val in ["line", "scatter", "step"]:
-        field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in "apv_model_as_string"]  # never want to plot this special string field
+        # never want to plot this special string field
+        field_options = ["{0} : {1}".format(k, props[k]) for k in props if not any(apv in k for apv in [ APV_MODEL ] ) ]
         xselect = Select(title="X axis", value=DEFAULT_UNSELECTED, options=field_options + [DEFAULT_UNSELECTED], name=X_AXIS_SELECTION)
         yselect = Select(title="Y axis", value=DEFAULT_UNSELECTED, options=field_options + [DEFAULT_UNSELECTED], name=Y_AXIS_SELECTION)
         xselect.on_change('value', lambda attr, old, new: make_2axis_graph())
@@ -227,7 +230,7 @@ def graphs_change():
 
     if graph_val in ["image"]:
         # alter the field options for known non-image fields
-        field_options = ["{0} : {1}".format(k, props[k]) for k in props if k not in ["apv_received_at", "apv_sequence_number", "apv_model_as_string"]]
+        field_options = ["{0} : {1}".format(k, props[k]) for k in props if not any(apv in k for apv in [APV_RECVD, APV_SEQNO, APV_MODEL] ) ]
         imageselect = Select(title="Image Field", value=DEFAULT_UNSELECTED, options=[DEFAULT_UNSELECTED] + field_options, name=IMAGE_SELECTION)
         mimeselect = Select(title="MIME Type", value=DEFAULT_UNSELECTED, options=[DEFAULT_UNSELECTED] + SUPPORTED_MIME_TYPES, name=MIME_SELECTION)
         imageselect.on_change('value', lambda attr, old, new: image_selection_change())
@@ -237,7 +240,7 @@ def graphs_change():
     if graph_val in ["table"]:
         # TODO: limit selectable columns to whose of the same size (table height)
         # use just the field name; don't show properties in the multi-select box
-        col_options = [k for k in props if k not in ["apv_received_at", "apv_sequence_number", "apv_model_as_string"]]
+        col_options = [k for k in props if not any (apv in k for apv in [APV_RECVD, APV_SEQNO, APV_MODEL] ) ]
         columnmultiselect = MultiSelect(title="Columns:", value=[], options=col_options, name=COLUMN_MULTISELECT)
         columnmultiselect.on_change('value', lambda attr, old, new: column_selection_change())
         d.add_root(column(Div(text=""), widgetbox([columnmultiselect]), name=COLUMN_SELECTION))
@@ -267,11 +270,11 @@ def graphs_change():
 def image_selection_change():
     """Callback for changing the image field or mime field"""
 
-    def return_image(val, model_id, message_name, field, mime, sind):
+    def return_image(val, model_id, message_name, field_name, mime, sind):
         """Returns a URL resolvable by the probe"""
         column_data_source = curdoc().get_model_by_name(sind)
         index = column_data_source.tags[0]
-        url = "http://{0}/image/".format(_host) + "---".join([model_id, message_name, field, mime, sind, str(index)])
+        url = "http://{0}/image/".format(_host) + "---".join([model_id, message_name, field_name, mime, sind, str(index)])
         return url
 
     d = curdoc()

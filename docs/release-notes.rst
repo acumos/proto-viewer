@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
-[1.5.4] - 7/26/2018
+[1.5.4] - 7/30/2018
 -------------------
 
 - Add test data
