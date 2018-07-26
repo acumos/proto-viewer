@@ -9,6 +9,11 @@ from acumos_proto_viewer.exceptions import SchemaNotReachable
 
 _logger = get_module_logger(__name__)
 
+# well-known probe field names
+APV_RECVD = "apv_received_at"
+APV_SEQNO = "apv_sequence_number"
+APV_MODEL = "apv_model_as_string"
+
 OUTPUT_DIR = "/tmp/protofiles"
 makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,7 +23,7 @@ def _gen_compiled_proto_path(model_id):
     Generates the expected compiled proto path from a model_id
     """
     path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
-    _logger.debug("_gen_compiled_proto_path: result is %s", path)
+    # _logger.debug("_gen_compiled_proto_path: result is %s", path)
     return path
 
 
@@ -36,13 +41,13 @@ def _compile_proto(model_id):
     """
     Invokes the protoc utility to compile a .proto file and produce a Python module.
     The generated module will be at (OUTPUT_DIR)/(model_id)_pb2.py
-        NOTE: if this already exists, this function returns immediately. This is a kind of cache I suppose.
-        TODO: add a flag to force a recompile
+    NOTE: if this already exists, this function returns immediately. This is a kind of cache I suppose.
+    TODO: add a flag to force a recompile
     """
     gen_module = _gen_compiled_proto_path(model_id)
 
     expected_proto = "{0}/{1}.proto".format(OUTPUT_DIR, model_id)
-    _logger.debug("_compile_proto: expected_proto is %s", expected_proto)
+    # _logger.debug("_compile_proto: expected_proto is %s", expected_proto)
     if not isfile(expected_proto):
         _logger.error("Proto file {0} does not exist! {1} listing: {2}".format(
             expected_proto, OUTPUT_DIR, listdir(OUTPUT_DIR)))
@@ -68,9 +73,9 @@ def _inject_apv_keys_into_schema(schema_entrypoint):
     """
     Injects well-known proto-viewer keys into a jsonschema.
     """
-    schema_entrypoint["apv_received_at"] = {'type': 'integer'}
-    schema_entrypoint["apv_model_as_string"] = {'type': 'string'}
-    schema_entrypoint["apv_sequence_number"] = {'type': 'integer'}
+    schema_entrypoint[APV_MODEL] = {'type': 'string'}
+    schema_entrypoint[APV_RECVD] = {'type': 'integer'}
+    schema_entrypoint[APV_SEQNO] = {'type': 'integer'}
 
 
 def _protobuf_to_js(module_name):
@@ -98,13 +103,13 @@ def _register_jsonschema(js_schema, model_id):
 
 def _register_proto(proto_name, model_id):
     """
-    Makes a proto file "known" to this viz
-    Later this would get done on demand when an unknown message type comes in
-    by querying the catalog with the model_id.
+    Makes a proto file known to this viz.
+    Later this would get done on demand when an unknown message type
+    arrives by querying the catalog with the model_id.
     """
     from acumos_proto_viewer import data
 
-    _logger.info("Registering previously unregistered proto %s", model_id)
+    _logger.info("_register_proto: processing model_id {0}".format(model_id))
     _compile_proto(model_id)
     data.proto_data_structure[model_id] = {}
     j_schema = _protobuf_to_js(model_id)
@@ -117,14 +122,13 @@ def _register_proto(proto_name, model_id):
         data.proto_data_structure[model_id]["messages"][key.split(
             ".")[1]] = {"properties": j_schema["definitions"][key]["properties"]}
 
-    _logger.debug("_register_proto: corresponding JSON schema is: ")
-    _logger.debug(json.dumps(j_schema))
+    _logger.debug("_register_proto: corresponding JSON schema: {0}".format(json.dumps(j_schema)))
 
 
 def _proto_url_to_model_id(url):
     # protoc cannot handle filenames with . in it!. It also renames "-" to "_"
     model_id = url.split("/")[-1].replace(".", "").replace("-", "_")
-    _logger.debug("_proto_url_to_model_id: result is %s", model_id)
+    # _logger.debug("_proto_url_to_model_id: result is %s", model_id)
     return model_id
 
 
@@ -133,17 +137,17 @@ def _wget_proto(url, model_id):
     Fetches a proto file from the specified URL for the specified message (model).
     """
     fname = model_id + ".proto"
-    _logger.debug("_wget_proto: attempting to download %s", url)
+    _logger.debug("_wget_proto: GET of %s", url)
     r = requests.get(url)
     if r.status_code == 200:
         wpath = "{0}/{1}".format(OUTPUT_DIR, fname)
         with open(wpath, "w") as f:
             f.write(r.text)
-        _logger.debug("{0} successfully downloaded to {1}, model_id = {2}".format(
-            url, wpath, model_id))
+        _logger.debug("_wget_proto: model_id {0}, url {1} downloaded to {2}".format(
+            model_id, url, wpath))
         return model_id, fname
     else:
-        _logger.error("_wget_proto faileddr: unable to reach %s", url)
+        _logger.error("_wget_proto failed: unable to reach %s", url)
         raise SchemaNotReachable()
 
 
@@ -171,7 +175,7 @@ def _register_schema_from_url(url, schema_type, model_id):
     URL, and when it receives a partial. If it is not given a full URL, AND that
     NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable.
     """
-    _logger.debug("_register_schema_from_url: checking model_id %s", model_id)
+    # _logger.debug("_register_schema_from_url: checking model_id %s", model_id)
     # short circut if already registered
     if _check_model_id_already_registered(model_id):
         return model_id
@@ -239,7 +243,7 @@ def load_proto(model_id, cache={}):
     if model_id in cache:
         return cache[model_id]
     expected_path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
-    _logger.debug("load_proto: checking cache path %s", expected_path)
+    # _logger.debug("load_proto: checking cache path %s", expected_path)
     module = load_module(model_id, expected_path)
     cache[model_id] = module
     return module
