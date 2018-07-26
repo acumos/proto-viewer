@@ -9,6 +9,11 @@ from acumos_proto_viewer.exceptions import SchemaNotReachable
 
 _logger = get_module_logger(__name__)
 
+# well-known probe field names
+APV_RECVD = "apv_received_at"
+APV_SEQNO = "apv_sequence_number"
+APV_MODEL = "apv_model_as_string"
+
 OUTPUT_DIR = "/tmp/protofiles"
 makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,7 +23,7 @@ def _gen_compiled_proto_path(model_id):
     Generates the expected compiled proto path from a model_id
     """
     path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
-    _logger.debug("_gen_compiled_proto_path: result is %s", path)
+    # _logger.debug("_gen_compiled_proto_path: result is %s", path)
     return path
 
 
@@ -68,9 +73,9 @@ def _inject_apv_keys_into_schema(schema_entrypoint):
     """
     Injects well-known proto-viewer keys into a jsonschema.
     """
-    schema_entrypoint["apv_received_at"] = {'type': 'integer'}
-    schema_entrypoint["apv_model_as_string"] = {'type': 'string'}
-    schema_entrypoint["apv_sequence_number"] = {'type': 'integer'}
+    schema_entrypoint[APV_RECVD] = {'type': 'integer'}
+    schema_entrypoint[APV_MODEL] = {'type': 'string'}
+    schema_entrypoint[APV_SEQNO] = {'type': 'integer'}
 
 
 def _protobuf_to_js(module_name):
@@ -124,7 +129,7 @@ def _register_proto(proto_name, model_id):
 def _proto_url_to_model_id(url):
     # protoc cannot handle filenames with . in it!. It also renames "-" to "_"
     model_id = url.split("/")[-1].replace(".", "").replace("-", "_")
-    _logger.debug("_proto_url_to_model_id: result is %s", model_id)
+    # _logger.debug("_proto_url_to_model_id: result is %s", model_id)
     return model_id
 
 
@@ -171,7 +176,7 @@ def _register_schema_from_url(url, schema_type, model_id):
     URL, and when it receives a partial. If it is not given a full URL, AND that
     NEXUSENDPOINTURL does not exist, this function throws a SchemaNotReachable.
     """
-    _logger.debug("_register_schema_from_url: checking model_id %s", model_id)
+    # _logger.debug("_register_schema_from_url: checking model_id %s", model_id)
     # short circut if already registered
     if _check_model_id_already_registered(model_id):
         return model_id
@@ -239,7 +244,7 @@ def load_proto(model_id, cache={}):
     if model_id in cache:
         return cache[model_id]
     expected_path = "{0}/{1}_pb2.py".format(OUTPUT_DIR, model_id)
-    _logger.debug("load_proto: checking cache path %s", expected_path)
+    # _logger.debug("load_proto: checking cache path %s", expected_path)
     module = load_module(model_id, expected_path)
     cache[model_id] = module
     return module
