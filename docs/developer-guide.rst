@@ -20,71 +20,19 @@
 Proto Viewer Developer Guide
 ============================
 
-This project allows visualization of data being transferred in protobuf format.
-Probing a specific message requires access to the corresponding protocol buffer
-definition (.proto) file on an external network server, usually a Nexus registry.
-
-Development Quickstart
-======================
-
-The following steps set up a development environment without use of Docker.
-
-0. Install prerequisites locally so they can be invoked by the probe:
-
-    a. Python version 3.6+, ideally in a virtual environment
-    b. The protocol buffer compiler ("protoc"), version 3.5 or later
-    c. The `npm` tool, version 2.15.5 or later
-    d. The `npm` package `protobuf-jsonschema`, version 1.1.1 or later (`npm install protobuf-jsonschema`)
-
-1. Clone the proto-viewer repository (which you probably already have done, since you're reading this)::
-
-    git clone https://gerrit.acumos.org/r/proto-viewer
-
-2. Download and build the redis server on the development machine, then start it:
-
-    https://redis.io/download
-
-    src/redis-server --daemonize yes
-
-3. Create a virtual environment with Python 3.6 or later locally::
-
-    virtualenv -p python3.6 apv36
-
-The name "apv36" is not magic, but will be used in all of the following directions.
-
-4. Use the virtual environment to install this package::
-
-    ./apv36/bin/pip install -r requirements.txt
-    ./apv36/bin/pip install .
-
-5. Start a trivial Python server to publish the protocol buffer definition files, it uses port 8000 by default::
-
-    cd tests/fixtures; ../../apv36/bin/python3 -m http.server
-
-6. Set an environment variable with the URL of the little python server that has the required protobuf files::
-
-    export NEXUSENDPOINTURL=http://localhost:8000
-
-7. Launch the Bokeh-enabled web server::
-
-    ./apv36/bin/python3 bin/run.py
-
-8. Start the data-injection script::
-
-    ./apv36/bin/python3 fake_data.py
-
-9. Open a web browser::
-
-    http://localhost:5006
-
-Never ever try to change the port. It will not work. It will evolve to endless suffering. Darkness will envelop you.  Essentially there's a bug in Bokeh.
+This project allows visualization of messages transferred in protobuf format.
+This is a passive component that shows the messages explicitly delivered to it; 
+it does not listen ("sniff") all network traffic searching for protobuf data.
+Displaying the contents of a protobuf message requires the corresponding protocol 
+buffer definition (.proto) file, which are fetched from a network server,
+usually a Nexus registry.
 
 Dependencies
 ============
 
 If you are running in Docker there are no external dependencies, for better or worse[1] it is totally self contained.
 
-If you are running locally, please follow the quickstart above.
+If you are running locally, please follow the quickstart guide below.
 
 [1] This Docker container runs Nginx, Redis, and Bokeh. The original requirements stated that the probe had to be a single Docker container.
 
@@ -92,14 +40,14 @@ Design
 ======
 
 The proto-viewer enables viewing of binary-encoded protocol buffer messages
-passed among elements of a composite solution. To display message content
-the proto-viewer must parse the binary message using a protocol buffer message
-definition file. Those files are obtained dynamically by the proto-viewer
-from network sources.
+passed among elements of a composite solution by the runtime orchestrator
+component. To display message content the proto-viewer must parse the binary
+message using a protocol buffer message definition file. Those files are obtained
+dynamically by the proto-viewer from network sources.
 
 Messages are passed to the proto-viewer by the Acumos blueprint orchestrator
 component, also known as the model connector.  The model connector makes HTTP POST
-calls to deliver a copy of each message to the proto-viewer along with details
+calls to deliver a copy of each message to the proto-viewer along with some details
 about the message definition.
 
 Each message POST-ed to the proto-viewer must contain only binary Protocol-Buffer
@@ -165,6 +113,9 @@ automatically clean up **/tmp** on reboot.
 Build
 =====
 
+Follow these instructions to build the Docker image with all required software.
+Please note "YOURREG" is a host name where a Docker registry server listens.
+
 .. code:: bash
 
     docker build -t YOURREG:18443/acumos_proto_viewer:1.0.0 .
@@ -173,32 +124,21 @@ Build
 Run
 ===
 
+Follow these instructions to launch the Docker image with the proto-viewer.
+
 .. code:: bash
 
     docker run -dit -p 80:80 YOURREG:18443/acumos_proto_viewer:1.0.0
 
 
-Optional additional env variables
----------------------------------
+Optional additional environment variables
+-----------------------------------------
 
-You can also pass in the following to alter the run behavior:
+You can also set the following environment variables to alter the proto-viewer behavior:
 
-1. UPDATE_CALLBACK_FREQUENCY // sets the frequency, in ms (1000=every
-   second) of the callbacks that update the graphs on the screen, e.g.,
+1. UPDATE_CALLBACK_FREQUENCY
+   This sets the frequency (milliseconds, 1000=every second) of the callbacks that update the graphs on the screen, e.g., 500.
 
-
-Fake data
-=========
-
-To launch a script that generates fake data and sends it:
-
-.. code:: bash
-
-    fake_data.py [host:port]
-
-**[host:port]** is an optional cmd line argument giving the target proto
-to send data to; it defaults to **localhost:5006** for local
-development.
 
 Extra Fields
 ============
@@ -206,9 +146,135 @@ Extra Fields
 Every protobuf message that enters the **/senddata** endpoint is
 injected, by this server, with additional keys:
 
-1. **apv_received_at**: the epoch timestamp that the model was received
-   at. Used for plotting a single variable against time
-2. **apv_model_as_string**: the string representation of the entire
-   model, used for plotting the raw text if the user chooses
-3. **apv_sequence_number**: the sequence number of this “type” of raw
+#. **apv_received_at**: the epoch timestamp when the model was received.
+   Can be used for plotting a single variable against time
+#. **apv_model_as_string**: the string representation of the entire
+   model, used for plotting the raw message content and structure
+#. **apv_sequence_number**: the sequence number of this “type” of raw
    data, where type = (model_id, message_name)
+
+
+Development Quickstart
+======================
+
+The following steps set up a machine as a development and test environment without use of Docker,
+which is convenient for use on a typical desktop/laptop.
+
+#. Install prerequisites so they can be invoked by the probe:
+
+    a. Python version 3.6+, ideally in a virtual environment
+    b. The protocol buffer compiler ("protoc"), version 3.4 or later
+    c. The `npm` tool, version 2.15.5 or later
+    d. The `npm` package `protobuf-jsonschema`, version 1.1.1 or later (`npm install protobuf-jsonschema`)
+
+#. Clone the proto-viewer repository (which you may already have done, since you're reading this)::
+
+    git clone https://gerrit.acumos.org/r/proto-viewer
+
+#. Download the redis server on the development machine from this site, then build::
+
+    https://redis.io/download
+
+#. Start the redis server on the development machine::
+
+    src/redis-server
+
+#. Create a virtual environment with Python 3.6 or later.  The name "apv36" is not magic, but will be used in all of the following directions::
+
+    virtualenv -p python3.6 apv36
+
+#. Use the newly created virtual environment to install the proto-viewer (i.e., this) python package::
+
+    ./apv36/bin/pip install -r requirements.txt
+    ./apv36/bin/pip install .
+
+#. Start a Python HTTP server to publish the protocol buffer definition files. It uses port 8000 by default::
+
+    cd tests/fixtures; ../../apv36/bin/python3 -m http.server
+
+#. Set an environment variable with the appropriate URL of the Python HTTP server::
+
+    export NEXUSENDPOINTURL=http://localhost:8000
+
+#. Launch the Bokeh-enabled web server that is the proto-viewer::
+
+    ./apv36/bin/python3 bin/run.py
+
+#. Start the data-injection script::
+
+    ./apv36/bin/python3 fake_data.py
+
+#. Open a web browser::
+
+    http://localhost:5006
+
+Never ever change the port. It will not work. It will evolve to endless suffering. Darkness will envelop you. Essentially there's a bug in Bokeh.
+
+
+Testing
+=======
+
+The proto-viewer can be tested standalone; i.e., without deploying a composite
+solution to any cloud environment.  Follow the development quickstart instructions
+above to install prerequisites and start the necessary servers.  Then use the 
+data-generation script described next.
+
+Data Injector
+-------------
+
+A Python script is provided to generate and send data to the probe.  The name is
+"fake_data.py" and it can be found in the bin subdirectory.  Launch the script like this:
+
+.. code:: bash
+
+    fake_data.py [host:port]
+
+**[host:port]** is an optional cmd line argument giving the target proto
+to send data to; it defaults to **localhost:5006** for local development.
+
+Test Messages
+-------------
+
+The test script creates and sends messages continually.  Those messages are cached within
+the running Redis server.  The following message types are used:
+
+#. image-mood-classification-100.
+   This message carries an array of objects including an image.
+#. probe-testimage-100
+   This message carries a single image.
+    Use this to test display of an image.
+#. probe-testnested-100
+   This message has a hierarchical message; i.e., an inner complex object within an outer complex object.
+   Use this to test selection of nested fields.
+#. probe-testxyz-100
+   This message carries several numeric and string values.
+   Use this to test plotting x, y values on various graphs.
+
+
+Expected Behavior
+-----------------
+
+Use a web browser to visit the proto-viewer with the appropriate host and port, the default URL is the following::
+
+    http://localhost:5006
+    
+Upon browsing to this URL a page like the following should load:
+
+ |img-probe-start|
+
+After the data-injection script has sent a few data points, follow these steps to view a plot of data
+that arrives in a nested message:
+
+#. In the Model Selection drop-down, pick item "protobuf_probe_testnested_100proto"
+#. In the Message Selection drop-down, pick item "NestOuter"
+#. In the Graph Selection drop-down, pick item "scatter"
+#. In the X axis drop-down, pick item "i.x : {'type': 'number'}
+#. In the Y axis drop-down, pick item "i.y : {'type': 'number'}
+
+The page should change to resemble the following:
+
+ |img-probe-plot|
+
+
+.. |img-probe-start| image:: probe-start.png
+.. |img-probe-plot|  image:: probe-plot.png

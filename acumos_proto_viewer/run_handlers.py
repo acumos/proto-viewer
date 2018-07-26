@@ -42,7 +42,7 @@ def get_model_properties(model_id, message_name, model_type):
     """
     Gets model properties
     """
-    return data.proto_data_structure[model_id]["messages"][message_name]["properties"] if model_type == "protobuf" else data.jsonschema_data_structure[model_id]["json_schema"]["properties"]
+    return data.proto_data_structure[model_id]["messages"][message_name]["properties_flat"] if model_type == "protobuf" else data.jsonschema_data_structure[model_id]["json_schema"]["properties"]
 
 
 def get_source_index(session_id, model_id, message_name, field_name=None):
@@ -68,10 +68,13 @@ def handle_data_post(headers, req_body):
     if (proto_url is None or message_name is None):
         return 400, "Error: PROTO-URL or Message-Name header missing."
     try:
-        data.inject_data(req_body, proto_url, message_name)
-        # Kazi has asked that due to the way the Acmos "model conector" aka "blueprint orchestrator" works,
-        # that I should return the request body that I received
-        return 200, req_body
+        res = data.inject_data(req_body, proto_url, message_name)
+        # due to the way the Acmos "model conector" aka "blueprint orchestrator" works,
+        # this should return the same request body that it received
+        if res:
+            return 200, req_body
+        else:
+            return 400, req_body
     except SchemaNotReachable:
         _logger.error("handle_data_post: failed to download def for url %s", proto_url)
         return 400, "Error: {0} was not downloadable!".format(proto_url)
