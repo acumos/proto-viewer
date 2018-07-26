@@ -10,16 +10,20 @@ import acumos_proto_viewer.utils
 import sys
 import os
 
+# determine base directory, the parent of bin where this lives
+scripthome = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def load_proto(model_id):
     """
-    Loads a protobuf module and returns it
+    Loads a protoc-generated python module and returns it
     """
-    expected_path = "tests/fixtures/{0}_pb2.py".format(model_id)
+    expected_path = "{0}/tests/fixtures/{1}_pb2.py".format(scripthome, model_id)
     module = acumos_proto_viewer.utils.load_module(model_id, expected_path)
     return module
 
 test = load_proto("probe_testxyz_100_proto")
-test2 = load_proto("probe_testimage_100_proto")
+testnest = load_proto("probe_testnested_100_proto")
+testimg = load_proto("probe_testimage_100_proto")
 ARRAY_TEST = load_proto("image_mood_classification_100_proto")
 
 HOST = "localhost:5006" #default
@@ -51,7 +55,27 @@ while True:
         except requests.exceptions.ConnectionError: #allow this script to keep running when developing and shutting on/off the server
             pass
 
-    #try a test with arrays
+    # test with nested data
+    inner = testnest.NestInner()
+    inner.x = random.randint(0, 10)
+    inner.y = random.randint(20, 50)
+    inner.z = random.randint(50, 100)
+    outer = testnest.NestOuter()
+    outer.tag = "some tag"
+    # cannot assign to an inner field, but you can copy
+    outer.i.CopyFrom(inner)
+    msgnest = outer.SerializeToString()
+    try:
+        r = requests.post(url,
+                          data=msgnest,
+                          headers={"PROTO-URL": "{0}/probe-testnested-100.proto".format(NEXUS),
+                                   "Message-Name": "NestOuter"})
+        print("Testnest: status code: {0}".format(r.status_code))
+        assert(msgnest == r.content)
+    except requests.exceptions.ConnectionError: #allow this script to keep running when developing and shutting on/off the server
+        pass
+
+        #try a test with arrays
     new_dict = {}
     for listKey in ['good', 'bad', 'ugly', 'very good', 'very bad', 'very ugly', 'beautiful', 'horrid', 'amazing', 'terrible']:
         new_dict[listKey] = random.random()
@@ -67,7 +91,7 @@ while True:
     except requests.exceptions.ConnectionError: #allow this script to keep running when developing and shutting on/off the server
         pass
 
-    msg2 = test2.TransformedImagePNG()
+    msg2 = testimg.TransformedImagePNG()
     theimage = random.choice(["1.png","2.png","3.png","4.png","5.png","6.png","7.png","8.png","9.png","10.png"])
     # expects to be called with CWD of project base
     thefile = "tests/fixtures/{0}".format(theimage)
@@ -84,7 +108,7 @@ while True:
     except requests.exceptions.ConnectionError:
         pass
 
-    msg3 = test2.TransformedImageJPEG()
+    msg3 = testimg.TransformedImageJPEG()
     theimage = random.choice(["1j.jpg","2j.jpg","3j.jpg","4j.jpg", "5j.jpg", "6j.jpg"])
     # expects to be called with CWD of project base
     thefile = "tests/fixtures/{0}".format(theimage)
