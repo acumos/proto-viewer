@@ -1,22 +1,19 @@
-from acumos_proto_viewer.utils import load_proto, register_jsonschema_from_url, register_proto_from_url
-
-import jsonschema
-import hashlib
-import uuid
-from threading import Thread
-
+import copy
 from datetime import date, datetime
 from datetime import time as dttime
-import time
-import json
-import pickle
-import copy
-
-import requests
-
 from google.protobuf.json_format import MessageToJson
-from acumos_proto_viewer import get_module_logger
+import hashlib
+import json
+import jsonschema
+import pickle
 import redis
+import requests
+from threading import Thread
+import time
+import uuid
+
+from acumos_proto_viewer import get_module_logger
+from acumos_proto_viewer.utils import load_proto, register_jsonschema_from_url, register_proto_from_url, APV_RECVD, APV_SEQNO, APV_MODEL
 
 _logger = get_module_logger(__name__)
 
@@ -26,12 +23,54 @@ jsonschema_data_structure = {}
 myredis = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
+def _repair_json_data(model_id, message_name, pb_msg, json_equiv, sequence_no):
+    """
+    Restores byte-array fields that were mangled by the PB toJson method.
+    Recurses on nested messages.
+    """
+    exp_fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys()
+    for f in exp_fields:
+        if f == APV_RECVD:
+            json_equiv[f] = int(time.time())
+        elif f == APV_SEQNO:
+            json_equiv[f] = sequence_no
+        elif f == APV_MODEL:
+            pass  # handled elsewhere
+        else:
+            # check if the item type was bytes, and preserve it if so, no encoding!
+            # TODO! Check for nested things like arrays of bytes!
+            item = getattr(pb_msg, f)
+            if isinstance(item, bytes) or isinstance(item, int):
+                json_equiv[f] = item
+            elif hasattr(item, "DESCRIPTOR"):
+                # A nested message
+                d = getattr(item, "DESCRIPTOR")
+                # print((f, item, type(item), json_equiv[f], d.name))
+                _repair_json_data(model_id, d.name, item, json_equiv[f], sequence_no)
+
+
+def _clean_json_for_display(json):
+    """
+    Prepares JSON for display in the raw format: deletes APV-injected keys
+    and changes bytes to short string. Recurses on nested messages.
+    """
+    del json[APV_SEQNO]
+    del json[APV_RECVD]
+    for k in json:
+        v = json[k]
+        if isinstance(v, bytes):
+            json[k] = "<RAW BYTES>"
+        elif isinstance(v, dict):
+            _clean_json_for_display(v)
+
+
 def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no):
     """
     Converts an inbound protobuf message to JSON, preserving byte fields.
     Google's builtin method MessageToJson *silently reencodes* byte fields as base64.
     But we don't want that because that breaks images that arrive as raw bytes. So
-    this preserves byte fields. Also it injects values for well-known probe fields.
+    after protobuf mangles the byte fields, this repairs their original value.
+    Also it injects values for well-known probe fields.
     """
     # this level of chattiness is not desirable for typical use
     # _logger.debug("_msg_to_json_preserve_bytes: model_id %s, message %s", model_id, message_name)
@@ -40,32 +79,13 @@ def _msg_to_json_preserve_bytes(binarydata, model_id, message_name, sequence_no)
     msg.ParseFromString(binarydata)
     # https://stackoverflow.com/questions/43835243/google-protobuf-json-format-messagetojson-changes-names-of-fields-how-to-avoid
     json_equiv = json.loads(MessageToJson(msg, preserving_proto_field_name=True))
-    exp_fields = proto_data_structure[model_id]["messages"][message_name]["properties"].keys()
-    for f in exp_fields:
-        if f == "apv_received_at":
-            json_equiv[f] = int(time.time())
-        elif f == "apv_sequence_number":
-            json_equiv[f] = sequence_no
-        elif f == "apv_model_as_string":
-            pass  # handled later below
-        else:
-            # check if the item type was bytes, and preserve it if so, no encoding!
-            # TODO! Check for nested things like arrays of bytes!
-            item = getattr(msg, f)
-            # print((f, item, type(item), json_equiv[f]))
-            if isinstance(item, bytes) or isinstance(item, int):
-                json_equiv[f] = item
-
-    # in order to do the json serialization for the RAW format, create a copy
-    # of this where we take the bytes and b64 them
+    # Put back byte arrays
+    _repair_json_data(model_id, message_name, msg, json_equiv, sequence_no)
+    # Create JSON suitable for display ("raw") use:
+    # remove the metadata and abbreviate any byte fields
     json_copy = copy.deepcopy(json_equiv)
-    del json_copy["apv_sequence_number"]
-    del json_copy["apv_received_at"]
-    for k in json_copy:
-        v = json_copy[k]
-        if isinstance(v, bytes):
-            json_copy[k] = "<RAW BYTES>"
-    json_equiv["apv_model_as_string"] = json.dumps(json_copy, indent=4, sort_keys=True)
+    _clean_json_for_display(json_copy)
+    json_equiv[APV_MODEL] = json.dumps(json_copy, indent=4, sort_keys=True)
     return json_equiv
 
 
@@ -94,7 +114,7 @@ def _get_raw_data_source_index(model_id, message_name):
 # PUBLIC
 
 
-def get_raw_data_source_size(model_id, message_name):
+def get_raw_data_source_count(model_id, message_name):
     index = _get_raw_data_source_index(model_id, message_name)
     return myredis.llen(index) if myredis.exists(index) else 0
 
@@ -115,31 +135,34 @@ def inject_data(binarydata, proto_url, message_name):
     """
     Injects data into the appropriate queue.
     Raises SchemaNotReachable if the proto_url is invalid.
+    Answers true if expected keys are found, otherwise false.
     In the future if the data moves to a database this would go away
     """
     # register the proto file. Will return immediately if already exists
     model_id = register_proto_from_url(proto_url)
 
-    size = get_raw_data_source_size(model_id, message_name)
+    count = get_raw_data_source_count(model_id, message_name)
     index = _get_raw_data_source_index(model_id, message_name)
-    _logger.debug("inject_data: message_name %s sequence %d", message_name, size + 1)
-    m = _msg_to_json_preserve_bytes(binarydata, model_id, message_name, size + 1)
+    _logger.debug("inject_data: message_name %s sequence %d", message_name, count + 1)
+    j = _msg_to_json_preserve_bytes(binarydata, model_id, message_name, count + 1)
     # safeguard against malformed data
-    act_keys = sorted(m.keys())
+    act_keys = sorted(j.keys())
     exp_keys = sorted(proto_data_structure[model_id]["messages"][message_name]["properties"].keys())
     if act_keys == exp_keys:
         # this auto creates the key if it does not exist yet #https://myredis.io/commands/lpush
         try:
-            pickled_message = pickle.dumps(m)
-            myredis.rpush(index, pickled_message)
+            pickled_json_message = pickle.dumps(j)
+            myredis.rpush(index, pickled_json_message)
         except Exception as exc:
             _logger.error("inject_data: failed to pickle data or upload it to redis")
             _logger.exception(exc)
-        if size == 0:
+        if count == 0:
             _logger.debug("inject_data: created new data source with TTL of one day")
             myredis.expire(index, 60 * 60 * 24)
     else:
-        _logger.warn("inject_data: dropped message due to unexpected keys: received {0} expected {1}".format(act_keys, exp_keys))
+        _logger.warn("inject_data: dropped message {0} due to unexpected keys: received {1} expected {2}".format(message_name, act_keys, exp_keys))
+        return False
+    return True
 
 
 def delete_mr_subscription(topic_name):
@@ -187,7 +210,7 @@ def mr_reader_thread(fully_qualified_topic_url, topic_name):
 
         message_name = "{0}_messages".format(topic_name)
 
-        size = get_raw_data_source_size(topic_name, message_name)
+        size = get_raw_data_source_count(topic_name, message_name)
         index = _get_raw_data_source_index(topic_name, message_name)
 
         item_sequence_no = size + 1
@@ -195,9 +218,9 @@ def mr_reader_thread(fully_qualified_topic_url, topic_name):
             data_item = json.loads(data_item)
 
             # set the apv fields
-            data_item["apv_model_as_string"] = json.dumps(data_item)
-            data_item["apv_received_at"] = int(time.time())
-            data_item["apv_sequence_number"] = item_sequence_no
+            data_item[APV_MODEL] = json.dumps(data_item)
+            data_item[APV_RECVD] = int(time.time())
+            data_item[APV_SEQNO] = item_sequence_no
 
             # safegaurd against malformed data
             try:
@@ -227,6 +250,6 @@ def list_known_jsonschemas():
 
 def list_known_protobufs():
     """
-    Returns the list of known protobufs
+    Returns the list of known protobuf model IDs
     """
     return [k for k in proto_data_structure]
