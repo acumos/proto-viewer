@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "2683a226_e62208eb",
+        "filename": "acumos_proto_viewer/__init__.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T19:55:33Z",
+      "side": 1,
+      "message": "huh. I will have to make a note of this for future.",
+      "parentUuid": "b3e4259b_1227ff00",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fbff045d_e3cd1df3",
         "filename": "acumos_proto_viewer/data.py",
         "patchSetId": 14
@@ -177,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "b13fb93e_249a691c",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T19:55:33Z",
+      "side": 1,
+      "message": "no need to revert, I\u0027ve no objection",
+      "parentUuid": "e605ea30_a79d7a86",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "731e7c52_2c8db32a",
         "filename": "acumos_proto_viewer/data.py",
         "patchSetId": 14
@@ -223,6 +259,24 @@
       "side": 1,
       "message": "Oh I disagree.  I found and fixed a bug in fake_data.  It was sending in garbage but never complaining because it always got 200 OK back.",
       "parentUuid": "62d35e3d_1000b961",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f2dbcf61_c440864e",
+        "filename": "acumos_proto_viewer/run_handlers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T19:55:33Z",
+      "side": 1,
+      "message": "No I meant,\n\nif res:\n    return\nreturn\n\nis the same as with the \"else\". In fact if you run this code through pylint it will complain that the else is unnecessary.",
+      "parentUuid": "c2eb98c9_459b640e",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -344,6 +398,24 @@
       "side": 1,
       "message": "someday maybe you\u0027ll teach me what you mean here",
       "parentUuid": "25b29081_2a37e2c6",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b8c3625d_aabd488d",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T19:55:33Z",
+      "side": 1,
+      "message": "https://www.python.org/dev/peps/pep-3107/\n\nessentially you can write the types of arguments and the return in the def header, like\n\n_register_schema_from_url(url: string, schema_type: string, model_id: string) -\u003e \"string representing model id\"",
+      "parentUuid": "218b457a_fa43b599",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
