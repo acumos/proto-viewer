@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "755faa1f_597f2ea3",
+        "filename": "acumos_proto_viewer/__init__.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "interesting, what was broken here? I use this in other projects.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fbff045d_e3cd1df3",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "just want to note that this function is impure, as it appears to mangle json_equiv in place. That\u0027s fine though",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3617dfd6_50d2e609",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "can this TODO! comment be removed now?",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0675ae6_1b2af131",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "sexier would be\n\nfor k, v in json.items():",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3b0d23_a8fad6d7",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "i don\u0027t really understand why count is better than size but OK.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "731e7c52_2c8db32a",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "good",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62d35e3d_1000b961",
+        "filename": "acumos_proto_viewer/run_handlers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "you don\u0027t need this else here. just the return is fine.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "615ff0ba_84dcdcb8",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "good, thanks.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b98891d7_a141488c",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "well done.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0a8c987_34c966d6",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "this comment can probably be removed. It does not appear that the probe will ever query the catalog to pull out proto files.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe891dd4_863f02db",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "it seems you have reversed your stance on chatiness \u003d)",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "25b29081_2a37e2c6",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "since this is python3 we could use functional annotations, would be better than this. But that\u0027s a seperate project.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "699e8c04_2d7f3a20",
+        "filename": "bin/run.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "I don\u0027t know if this should be in run.py. I think I would prefer this to be in utils, or maybe data. Run.py isn\u0027t unit tested. This function should certainly be unit tested.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e699659a_fbe8af64",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "the port here should also be YOURPORT, sorry, this 18443 was an internal detail leak.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e785f02c_a70b1efc",
+        "filename": "templates/acumos-proto-viewer.css",
+        "patchSetId": 14
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "whoaaa hey now. This is something I hadn\u0027t yet tried with Bokeh.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4bf73d19_f9cd2641",
+        "filename": "templates/embed.html",
+        "patchSetId": 14
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-08-02T13:50:24Z",
+      "side": 1,
+      "message": "should these liscnenses be updated to 2017-2018 if the files are touched?",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
