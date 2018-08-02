@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b3e4259b_1227ff00",
+        "filename": "acumos_proto_viewer/__init__.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "double output, once with your format and once without.",
+      "parentUuid": "755faa1f_597f2ea3",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fbff045d_e3cd1df3",
         "filename": "acumos_proto_viewer/data.py",
         "patchSetId": 14
@@ -30,6 +48,24 @@
       "writtenOn": "2018-08-02T13:50:24Z",
       "side": 1,
       "message": "just want to note that this function is impure, as it appears to mangle json_equiv in place. That\u0027s fine though",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ad170600_a19bb979",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "impure?",
+      "parentUuid": "fbff045d_e3cd1df3",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "00dd41fa_bf80422b",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "No this still doesn\u0027t handle arrays",
+      "parentUuid": "3617dfd6_50d2e609",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a0675ae6_1b2af131",
         "filename": "acumos_proto_viewer/data.py",
         "patchSetId": 14
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "9094961c_533dfa29",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0675ae6_1b2af131",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3b0d23_a8fad6d7",
         "filename": "acumos_proto_viewer/data.py",
         "patchSetId": 14
@@ -81,6 +153,24 @@
       "writtenOn": "2018-08-02T13:50:24Z",
       "side": 1,
       "message": "i don\u0027t really understand why count is better than size but OK.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e605ea30_a79d7a86",
+        "filename": "acumos_proto_viewer/data.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "oh I foolishly thought it was getting byte volume (size).  Count seemed clearer.  Happy to revert if you like.",
+      "parentUuid": "ba3b0d23_a8fad6d7",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -115,6 +205,24 @@
       "writtenOn": "2018-08-02T13:50:24Z",
       "side": 1,
       "message": "you don\u0027t need this else here. just the return is fine.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c2eb98c9_459b640e",
+        "filename": "acumos_proto_viewer/run_handlers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "Oh I disagree.  I found and fixed a bug in fake_data.  It was sending in garbage but never complaining because it always got 200 OK back.",
+      "parentUuid": "62d35e3d_1000b961",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -189,6 +297,24 @@
     },
     {
       "key": {
+        "uuid": "aab3fd17_c43f436e",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "yeah it was way too chatty",
+      "parentUuid": "fe891dd4_863f02db",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "25b29081_2a37e2c6",
         "filename": "acumos_proto_viewer/utils.py",
         "patchSetId": 14
@@ -200,6 +326,24 @@
       "writtenOn": "2018-08-02T13:50:24Z",
       "side": 1,
       "message": "since this is python3 we could use functional annotations, would be better than this. But that\u0027s a seperate project.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "218b457a_fa43b599",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "someday maybe you\u0027ll teach me what you mean here",
+      "parentUuid": "25b29081_2a37e2c6",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -223,6 +367,24 @@
     },
     {
       "key": {
+        "uuid": "574c1a71_2e591a03",
+        "filename": "bin/run.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "699e8c04_2d7f3a20",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e699659a_fbe8af64",
         "filename": "docs/developer-guide.rst",
         "patchSetId": 14
@@ -234,6 +396,24 @@
       "writtenOn": "2018-08-02T13:50:24Z",
       "side": 1,
       "message": "the port here should also be YOURPORT, sorry, this 18443 was an internal detail leak.",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a26f952b_f00420a7",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e699659a_fbe8af64",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -268,6 +448,24 @@
       "writtenOn": "2018-08-02T13:50:24Z",
       "side": 1,
       "message": "should these liscnenses be updated to 2017-2018 if the files are touched?",
+      "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d2501b84_f8e5af80",
+        "filename": "templates/embed.html",
+        "patchSetId": 14
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-02T18:49:35Z",
+      "side": 1,
+      "message": "no",
+      "parentUuid": "4bf73d19_f9cd2641",
       "revId": "db350dad8c1cc9210a774aa51661ff63ed7e53b4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
