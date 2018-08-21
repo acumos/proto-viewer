@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 import copy
 from datetime import date, datetime
 from datetime import time as dttime

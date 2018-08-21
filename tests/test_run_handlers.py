@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 import hashlib
 import fakeredis
 from acumos_proto_viewer.run_handlers import MODEL_SELECTION, MESSAGE_SELECTION

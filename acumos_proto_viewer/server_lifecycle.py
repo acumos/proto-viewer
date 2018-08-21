@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 from acumos_proto_viewer import get_module_logger
 
 _logger = get_module_logger(__name__)

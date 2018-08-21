@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 import hashlib
 from acumos_proto_viewer import data, get_module_logger
 from acumos_proto_viewer.exceptions import SchemaNotReachable

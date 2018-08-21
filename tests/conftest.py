@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 from requests.exceptions import HTTPError
 import pytest
 import os

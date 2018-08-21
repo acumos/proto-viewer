@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 import fakeredis
 import hashlib
 from acumos_proto_viewer.utils import register_proto_from_url

@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 from types import ModuleType
 from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _protobuf_to_js, get_message_data
 from acumos_proto_viewer import data
