@@ -1,3 +1,6 @@
+# Acumos - Apache 2.0
+
+
 from os.path import isfile
 from os import makedirs, listdir, environ
 from subprocess import PIPE, Popen
