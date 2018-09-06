@@ -300,7 +300,7 @@ def image_selection_change():
         _install_callback_and_cds(sind, model_id, message_name,
                                   {image_field: [return_image, {"model_id": model_id,
                                                                 "message_name": message_name,
-                                                                "field": image_field,
+                                                                "field_name": image_field,
                                                                 "mime": mime,
                                                                 "sind": sind}]},
                                   stream_limit=1)
