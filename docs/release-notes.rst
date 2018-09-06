@@ -25,6 +25,11 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.5.5] - 9/6/2018
+-------------------
+
+- Repair parameter-name botch in return_image callback (ACUMOS-1681)
+
 [1.5.4] - 7/30/2018
 -------------------
 
