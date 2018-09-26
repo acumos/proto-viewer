@@ -30,11 +30,13 @@ usually a Nexus registry.
 Dependencies
 ============
 
-If you are running in Docker there are no external dependencies, for better or worse[1] it is totally self contained.
+If you are running in Docker there are no external dependencies, for better or worse[1] it is
+totally self contained.
 
 If you are running locally, please follow the quickstart guide below.
 
-[1] This Docker container runs Nginx, Redis, and Bokeh. The original requirements stated that the probe had to be a single Docker container.
+[1] This Docker container runs Nginx, Redis, and Bokeh. The original requirements stated that
+the probe had to be a single Docker container.
 
 Design
 ======
@@ -81,6 +83,12 @@ but this should never happen without the version number changing.
 The probe then invokes the "protoc" compiler on the definition file to generate a
 Python module, working in a temporary directory.  Finally the proto-viewer imports
 the newly created Python module and uses it to parse binary messages.
+
+The probe normally listens for requests on port 5006, which unfortunately cannot be
+changed due to flaws in the Bokeh library.  The probe also limits connections using
+a websocket filter.  To allow deployment in a Kubernetes environment where port 5006
+is not readily accessible,  the probe can be configured to accept incoming requests
+on any port by setting the environment variable ACUMOS_PROBE_EXTERNAL_PORT.
 
 Data Retention
 ==============
@@ -132,10 +140,18 @@ Follow these instructions to launch the Docker image with the proto-viewer.
     docker run -dit -p 80:80 my.registry.com:12345/acumos_proto_viewer:1.0.0
 
 
+Required environment variables
+------------------------------
+
+The following required environment variables determine the proto-viewer behavior:
+
+1. ACUMOS_PROBE_EXTERNAL_PORT (optional, defaults to 5006)
+2. NEXUSENDPOINTURL (required, no useful default, must be URL of server with protobuf files)
+
 Optional additional environment variables
 -----------------------------------------
 
-You can also set the following environment variables to alter the proto-viewer behavior:
+The following optional environment variables alter the proto-viewer behavior:
 
 1. UPDATE_CALLBACK_FREQUENCY
    This sets the frequency (milliseconds, 1000=every second) of the callbacks that update the graphs on the screen, e.g., 500.
@@ -243,7 +259,7 @@ the running Redis server.  The following message types are used:
    This message carries an array of objects including an image.
 #. probe-testimage-100
    This message carries a single image.
-    Use this to test display of an image.
+   Use this to test display of an image.
 #. probe-testnested-100
    This message has a hierarchical message; i.e., an inner complex object within an outer complex object.
    Use this to test selection of nested fields.

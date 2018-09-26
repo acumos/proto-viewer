@@ -25,6 +25,11 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.5.6] - 9/26/2018
+-------------------
+
+- Read external port from environment with default to 5006 (ACUMOS-1790)
+
 [1.5.5] - 9/6/2018
 -------------------
 

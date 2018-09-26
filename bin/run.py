@@ -381,6 +381,8 @@ def modify_doc(doc):
 #   I think tornado is doing weird things with the state of the other threads and it doesn't share the state with this current document
 #    dont change this, at least not without understanding all this.
 
+# Allow requests from alternate port to support K8S deployment
+accept_origin = "*:" + os.environ.get("ACUMOS_PROBE_EXTERNAL_PORT", "5006")
 
 server = Server({'/bkapp': modify_doc},
                 num_procs=1,  # see above!
@@ -391,7 +393,7 @@ server = Server({'/bkapp': modify_doc},
                     ('/image/([^/]+)', ImageHandler),
                     ('/onap_topic_subscription/([^/]+)', ONAPMRTopicHandler)],
                 address="0.0.0.0",
-                allow_websocket_origin=["*:5006"])
+                allow_websocket_origin=[accept_origin])
 server.start()
 
 if __name__ == '__main__':
