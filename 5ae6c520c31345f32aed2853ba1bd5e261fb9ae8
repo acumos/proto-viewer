@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "abc0a787_6bc6f3db",
+        "filename": "tests/conftest.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-09-26T15:58:41Z",
+      "side": 0,
+      "message": "I would make these fixtures themselves, instead of making a new class called test_constants.",
+      "revId": "5ae6c520c31345f32aed2853ba1bd5e261fb9ae8",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}

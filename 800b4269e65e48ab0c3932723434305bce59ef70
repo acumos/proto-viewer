@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a387eb64_454f45cf",
+        "filename": "acumos_proto_viewer/utils.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-09-26T15:58:41Z",
+      "side": 1,
+      "message": "does this mean modelids may have the URL part in it? could be strange but I guess it\u0027s transparent and not a problem",
+      "revId": "800b4269e65e48ab0c3932723434305bce59ef70",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba461d8b_83131fc3",
+        "filename": "tests/conftest.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-09-26T15:58:41Z",
+      "side": 1,
+      "message": "this would be",
+      "revId": "800b4269e65e48ab0c3932723434305bce59ef70",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1dd037a7_26bc4da7",
+        "filename": "tests/test_run_handlers.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-09-26T15:58:41Z",
+      "side": 1,
+      "message": "I\u0027m sending an email offline about conftest. A better way to do this.",
+      "revId": "800b4269e65e48ab0c3932723434305bce59ef70",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
