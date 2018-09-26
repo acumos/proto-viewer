@@ -162,7 +162,7 @@ def inject_data(binarydata, proto_url, message_name):
             _logger.debug("inject_data: created new data source with TTL of one day")
             myredis.expire(index, 60 * 60 * 24)
     else:
-        _logger.warn("inject_data: dropped message {0} due to unexpected keys: received {1} expected {2}".format(message_name, act_keys, exp_keys))
+        _logger.warning("inject_data: dropped message {0} due to unexpected keys: received {1} expected {2}".format(message_name, act_keys, exp_keys))
         return False
     return True
 
