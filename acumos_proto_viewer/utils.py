@@ -165,11 +165,10 @@ def _register_proto(proto_name, model_id):
 
 def _proto_url_to_model_id(url):
     """
-    Mangles last component of URL to remove . (period) and change - (hyphen) to _ (underscore).
-    Returns the result.
+    Removes special characters from the URL (/.-:) to return a unique ID.
     protoc cannot handle filenames with . in them!
     """
-    model_id = url.split("/")[-1].replace(".", "").replace("-", "_")
+    model_id = url.replace(":", "_").replace("/", "_").replace("-", "_").replace(".", "_")
     # _logger.debug("_proto_url_to_model_id: result is %s", model_id)
     return model_id
 

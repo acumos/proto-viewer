@@ -3,9 +3,9 @@
 
 from requests.exceptions import HTTPError
 import pytest
-import os
 from acumos_proto_viewer.utils import load_proto
 from acumos_proto_viewer import data
+import test_constants
 
 
 class FakeResponse():
@@ -18,74 +18,21 @@ class FakeResponse():
             raise HTTPError(response=FakeResponse(404, ""))
 
 
-test_proto = """
-syntax = "proto3";
-
-package mygreatpackage;
-
-message Data1 {
-    double a = 1;
-    float b = 2;
-    int32 c = 3;
-    int64 d = 4;
-    bool e = 5;
-    string f = 6;
-    bytes g = 7;
-}
-
-message Data2 {
-    Data1 a = 1;
-    map<string, Data1> b = 2;
-    map<string, int32> c = 3;
-    repeated Data1 d = 4;
-    repeated int32 e = 5;
-}
-"""
-
-
-test_proto_with_arrays = """
-syntax = "proto3";
-package YKhGXjKWHYsPwKJFfEPnmoHOkDkPKBxX;
-
-service Model {
-  rpc classify (ImageTagSet) returns (ImageTagSet);
-}
-
-message ImageTagSet {
-  repeated int64 image = 1;
-  repeated string tag = 2;
-  repeated double score = 3;
-}
-"""
-
-
 @pytest.fixture
 def monkeyed_requests_get():
     def mrg(url):
-        if url == "http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto":
+        if url == test_constants.test_proto_url:
             return FakeResponse(status_code=200,
-                                text=test_proto)
-        if url == "http://myserver.com/fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto":
+                                text=test_constants.test_proto_txt)
+        if url == test_constants.test_proto_with_arrays_url:
             return FakeResponse(status_code=200,
-                                text=test_proto_with_arrays)
+                                text=test_constants.test_proto_with_arrays_txt)
         if url == "http://myserver.com/emptyinside":
             return FakeResponse(status_code=404,
                                 text="")
-        if url == "http://myserver.com/probe_testschema/1.0.0/probe_testschema-1.0.0":
-            fake_schema = """
-            {
-                "$schema": "http://json-schema.org/draft-04/schema#",
-                "properties": {
-                  "value": {
-                    "type": "number",
-                    "description": ""
-                  }
-                },
-                "required": ["value"],
-                "type": "object"
-              }
-            """
-            return FakeResponse(status_code=200, text=fake_schema)
+        if url == test_constants.test_probe_fake_schema_url:
+            return FakeResponse(status_code=200,
+                                text=test_constants.test_probe_fake_schema_txt)
 
     return mrg
 
@@ -93,21 +40,16 @@ def monkeyed_requests_get():
 @pytest.fixture
 def cleanuptmp():
     def _dt():
-        os.remove("/tmp/protofiles/fakemodelid_100_proto_pb2.py")
-        os.remove("/tmp/protofiles/fakemodelid_100_proto.proto")
-        os.remove("/tmp/protofiles/fakemodelidwitharrays_100_proto_pb2.py")
-        os.remove("/tmp/protofiles/fakemodelidwitharrays_100_proto.proto")
-        del data.proto_data_structure["fakemodelid_100_proto"]
-        del data.proto_data_structure["fakemodelidwitharrays_100_proto"]
-        assert('fakemodelidwitharrays_100_proto' not in data.list_known_protobufs())
-        assert('fakemodelid_100_proto' not in data.list_known_protobufs())
+        for mid in [test_constants.test_proto_mid, test_constants.test_proto_with_arrays_mid]:
+            del data.proto_data_structure[mid]
+            assert(mid not in data.list_known_protobufs())
     return _dt
 
 
 @pytest.fixture
 def fake_msg():
     def _fake_msg():
-        test = load_proto("fakemodelid_100_proto")
+        test = load_proto(test_constants.test_proto_mid)
         """
         message Data1 {
         double a = 1;
@@ -134,7 +76,7 @@ def fake_msg():
 @pytest.fixture
 def fake_msg_with_arrays():
     def _fake_msg_with_arrays():
-        test = load_proto("fakemodelidwitharrays_100_proto")
+        test = load_proto(test_constants.test_proto_with_arrays_mid)
         m = test.ImageTagSet(image=[1, 2, 3], tag=["fish", "cat", "dog"], score=[0.8, 0.9, 1.0])
         msgb = m.SerializeToString()
         return msgb

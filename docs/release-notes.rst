@@ -28,12 +28,13 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 [1.5.6] - 9/26/2018
 -------------------
 
-- Read external port from environment with default to 5006 (ACUMOS-1790)
+- Read external port from environment with default to 5006 (`ACUMOS-1790 <https://jira.acumos.org/browse/ACUMOS-1790>`_)
+- Extend method that generates model ID (`ACUMOS-1793 <https://jira.acumos.org/browse/ACUMOS-1793>`_)
 
 [1.5.5] - 9/6/2018
 -------------------
 
-- Repair parameter-name botch in return_image callback (ACUMOS-1681)
+- Repair parameter-name botch in return_image callback (`ACUMOS-1681 <https://jira.acumos.org/browse/ACUMOS-1681>`_)
 
 [1.5.4] - 7/30/2018
 -------------------
@@ -46,7 +47,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 [1.5.3] - 7/9/2018
 ------------------
 
-- Tell json converter to preserve protobuf names (ACUMOS-1366)
+- Tell json converter to preserve protobuf names (`ACUMOS-1366 <https://jira.acumos.org/browse/ACUMOS-1366>`_)
 - Add debug log to inject_data
 
 [1.5.2] - 6/29/2018
