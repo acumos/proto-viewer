@@ -29,6 +29,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 -------------------
 
 - Read external port from environment with default to 5006 (ACUMOS-1790)
+- Extend method that generates model ID (ACUMOS-1793)
 
 [1.5.5] - 9/6/2018
 -------------------

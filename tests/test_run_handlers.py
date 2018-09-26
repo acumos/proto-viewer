@@ -6,6 +6,7 @@ import fakeredis
 from acumos_proto_viewer.run_handlers import MODEL_SELECTION, MESSAGE_SELECTION
 from acumos_proto_viewer.run_handlers import get_source_index, handle_data_post, handle_onap_mr_put, handle_onap_mr_delete, get_model_properties, get_modelid_messagename_type
 from acumos_proto_viewer import data
+import test_constants
 
 
 def test_get_source_index():
@@ -30,20 +31,16 @@ def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, fake_msg
     Test run_handlers.handle_data_post
     """
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
-    assert('fakemodelid_100_proto' not in data.list_known_protobufs())
-    assert('fakemodelidwitharrays_100_proto' not in data.list_known_protobufs())
-    headers = {"PROTO-URL": "fakemodelid/1.0.0/fakemodelid-1.0.0-proto",
-               "Message-Name": "Data1"}
+    assert(test_constants.test_proto_mid not in data.list_known_protobufs())
+    assert(test_constants.test_proto_with_arrays_mid not in data.list_known_protobufs())
+    headers = {"PROTO-URL": test_constants.test_proto_url, "Message-Name": "Data1"}
     code, status = handle_data_post(headers, fake_msg())
-
-    headers = {"PROTO-URL": "fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto",
-               "Message-Name": "ImageTagSet"}
+    headers = {"PROTO-URL": test_constants.test_proto_with_arrays_url, "Message-Name": "ImageTagSet"}
     code, status = handle_data_post(headers, fake_msg())
+    assert(test_constants.test_proto_mid in data.list_known_protobufs())
+    assert(test_constants.test_proto_with_arrays_mid in data.list_known_protobufs())
 
-    assert('fakemodelid_100_proto' in data.list_known_protobufs())
-    assert('fakemodelidwitharrays_100_proto' in data.list_known_protobufs())
-
-    assert get_model_properties("fakemodelid_100_proto", "Data1", "protobuf") == {
+    assert get_model_properties(test_constants.test_proto_mid, "Data1", "protobuf") == {
         'a': {'type': 'number'},
         'b': {'type': 'number'},
         'c': {
@@ -63,7 +60,7 @@ def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, fake_msg
         'apv_model_as_string': {'type': 'string'},
         'apv_sequence_number': {'type': 'integer'}}
 
-    assert get_model_properties("fakemodelidwitharrays_100_proto", "ImageTagSet", "protobuf") == {
+    assert get_model_properties(test_constants.test_proto_with_arrays_mid, "ImageTagSet", "protobuf") == {
         "image": {
             "type": "array",
             "items": {
@@ -96,16 +93,12 @@ def test_handle_data_post(monkeypatch, monkeyed_requests_get, fake_msg, fake_msg
     }
 
     # test failures
-    headers = {"PROTO-UR": "fakemodelid/1.0.0/fakemodelid-1.0.0-proto",
-               "Message-Name": "Data1"}
-
+    headers = {"PROTO-URXXX": test_constants.test_proto_mid, "Message-Name": "Data1"}
     code, status = handle_data_post(headers, fake_msg())
     assert code == 400
     assert status == "Error: PROTO-URL or Message-Name header missing."
 
-    headers = {"PROTO-URL": "emptyinside",
-               "Message-Name": "Data1"}
-
+    headers = {"PROTO-URL": "emptyinside", "Message-Name": "Data1"}
     code, status = handle_data_post(headers, fake_msg())
     assert code == 400
     assert status == "Error: emptyinside was not downloadable!"
@@ -125,7 +118,7 @@ def test_handle_onap_mr_put_delete(monkeypatch, monkeyed_requests_get):
     monkeypatch.setattr('threading.Thread.start', noop)
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
 
-    headers = {"schema-url": "http://myserver.com/probe_testschema/1.0.0/probe_testschema-1.0.0",
+    headers = {"schema-url": test_constants.test_probe_fake_schema_url,
                "server-hostname": "foo",
                "server-port": 666}
 
