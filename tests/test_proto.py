@@ -6,36 +6,35 @@ from acumos_proto_viewer.utils import register_proto_from_url, load_proto, _prot
 from acumos_proto_viewer import data
 
 
-def test_register_load(monkeypatch, monkeyed_requests_get, cleanuptmp):
+def test_register_load(monkeypatch, monkeyed_requests_get, cleanuptmp,
+                       test_proto_url, test_proto_mid, test_proto_with_arrays_url, test_proto_with_arrays_mid):
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
-    register_proto_from_url(
-        "http://myserver.com/fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
-    register_proto_from_url(
-        "http://myserver.com/fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto")
-    assert('fakemodelid_100_proto' in data.list_known_protobufs())
-    assert('fakemodelidwitharrays_100_proto' in data.list_known_protobufs())
-    test_pb2 = load_proto("fakemodelid_100_proto")
-    test_pb2 = load_proto("fakemodelid_100_proto")  # cache hit
+    register_proto_from_url(test_proto_url)
+    register_proto_from_url(test_proto_with_arrays_url)
+    assert(test_proto_mid in data.list_known_protobufs())
+    assert(test_proto_with_arrays_mid in data.list_known_protobufs())
+    test_pb2 = load_proto(test_proto_mid)
+    test_pb2 = load_proto(test_proto_mid)  # cache hit
 
     assert isinstance(test_pb2, ModuleType)
 
-    test2_pb2 = load_proto("fakemodelidwitharrays_100_proto")
-    test2_pb2 = load_proto("fakemodelidwitharrays_100_proto")  # cache hit
+    test2_pb2 = load_proto(test_proto_with_arrays_mid)
+    test2_pb2 = load_proto(test_proto_with_arrays_mid)  # cache hit
 
     assert isinstance(test2_pb2, ModuleType)
 
     cleanuptmp()
 
 
-def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
+def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp,
+                        test_proto_url, test_proto_mid, test_proto_with_arrays_url, test_proto_with_arrays_mid):
     monkeypatch.setattr('requests.get', monkeyed_requests_get)
-    register_proto_from_url("fakemodelid/1.0.0/fakemodelid-1.0.0-proto")
-    register_proto_from_url(
-        "fakemodelidwitharrays/1.0.0/fakemodelidwitharrays-1.0.0-proto")
-    assert('fakemodelid_100_proto' in data.list_known_protobufs())
-    assert('fakemodelidwitharrays_100_proto' in data.list_known_protobufs())
+    register_proto_from_url(test_proto_url)
+    register_proto_from_url(test_proto_with_arrays_url)
+    assert(test_proto_mid in data.list_known_protobufs())
+    assert(test_proto_with_arrays_mid in data.list_known_protobufs())
 
-    js = _protobuf_to_js("fakemodelid_100_proto")
+    js = _protobuf_to_js(test_proto_mid)
     assert js == {
         "definitions": {
             "mygreatpackage.Data1": {
@@ -108,7 +107,8 @@ def test_protobuf_to_js(monkeypatch, monkeyed_requests_get, cleanuptmp):
             }
         }
     }
-    js = _protobuf_to_js("fakemodelidwitharrays_100_proto")
+
+    js = _protobuf_to_js(test_proto_with_arrays_mid)
     print(js)
     assert(js == {
         "definitions": {
