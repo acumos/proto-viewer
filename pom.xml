@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!-- This file publishes Docker name and tag for the LF Jenkins build script -->
-    <groupId>IGNORED</groupId>
+    <groupId>org.acumos.proto-viewer</groupId>
     <!-- docker image name -->
     <artifactId>acumos-proto-viewer</artifactId>
     <!-- docker tag -->
