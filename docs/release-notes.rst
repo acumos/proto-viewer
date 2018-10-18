@@ -25,6 +25,11 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.5.7] - 10/18/2018
+--------------------
+
+- Repair get-image method variable usage failure
+
 [1.5.6] - 9/26/2018
 -------------------
 

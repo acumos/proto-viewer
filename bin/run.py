@@ -83,8 +83,8 @@ class ImageHandler(RequestHandler):
             source = data.get_raw_data(model_id, message_name, i, i + 1)
             self.set_status(200)
             # field may be a dotted tuple
-            data = get_message_data(source[0], field_name)
-            self.write(data)
+            val = get_message_data(source[0], field_name)
+            self.write(val)
         else:
             self.set_status(404)
         self.finish()

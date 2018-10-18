@@ -7,7 +7,7 @@
     <!-- docker image name -->
     <artifactId>acumos-proto-viewer</artifactId>
     <!-- docker tag -->
-    <version>1.5.6</version> <!-- REPEATED IN setup.py MUST MATCH -->
+    <version>1.5.7</version> <!-- REPEATED IN setup.py MUST MATCH -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.sources>.</sonar.sources>
