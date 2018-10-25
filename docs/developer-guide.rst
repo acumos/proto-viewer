@@ -93,22 +93,39 @@ on any port by setting the environment variable ACUMOS_PROBE_EXTERNAL_PORT.
 Data Retention
 ==============
 
-The current server side (probe) data retention policy is that the raw
-data cache resets every midnight. Meaning, if a user logs into the
-probe, they will see all data that came in since the prior midnight, and
-will see new data as it streams in. This is because the probe may be a
-long running process, and memory would increase without bound, so the
-probe has to have a TTL on data. If there is a need for a user to log in
+The proto-viewer uses two data stores: the raw data in redis, and a Bokeh
+data structure known as a "ColumnDataStore". Bokeh expects to serve the data
+from the CDS. However, the CDS has some constraints on it, for example it is
+JSON, so it does not support "bytes", which are what images are. So there
+is actually a conversion between the raw incoming data and what Bokeh expects.
+
+The current server-side data retention policy in redis is that the 
+raw data cache resets every midnight. Meaning, if a user logs into the
+proto-viewer, they will see all data that came in since the prior midnight, 
+and will see new data as it streams in. This is because the proto-viewer 
+may be a long running process, and memory would increase without bound, so 
+there has to be a TTL on data. If there is a need for a user to log in
 and see MORE data than the prior midnight, we can change this later by
 increasing the TTL to the last week or something.
 
 For the client side, Bokeh has a notion of a DataSource per session,
 which holds the data sent from the server to the browser, so we also
 have to limit the client side data, in case a user is logged in for a
-very long time. The “streaming limit” for numerical data is 100,000
+very long time. The "streaming limit" for numerical data is 100,000
 records, just over a day of data assuming one record per second. The
 streaming limit for images and raw data is just 1; the user sees it as
 it goes by, or it is lost (there is currently no replay).
+ 
+The function that uploads data from redis to Bokeh (which is doing the copying), 
+depending on what the user is trying to look at, is a Bokeh callback implemented
+in the run.py script.
+ 
+I thought the Bokeh stores can have their own timeouts, and for the image one,
+the code set it to 1. This can be seen as " stream_limit" in the bokeh run file. 
+However now that I'm looking at Bokeh's documentation, I don't actually see that 
+parameter in their source code! So I'm not sure it works. It might just control 
+how many items go into it at any given time.
+
 
 Filesystem
 ==========
@@ -188,9 +205,13 @@ which is convenient for use on a typical desktop/laptop.
 
     git clone https://gerrit.acumos.org/r/proto-viewer
 
-#. Download the redis server on the development machine from this site, then build::
+#. Download the redis server source from this site::
 
     https://redis.io/download
+
+#. Build the redis binary, which requires a C compiler and the make tool::
+
+    make
 
 #. Start the redis server on the development machine::
 
