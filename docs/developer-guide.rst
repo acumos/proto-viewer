@@ -20,95 +20,125 @@
 Proto Viewer Developer Guide
 ============================
 
-This project allows visualization of messages transferred in protobuf format.
-This is a passive component that shows the messages explicitly delivered to it; 
-it does not listen ("sniff") all network traffic searching for protobuf data.
-Displaying the contents of a protobuf message requires the corresponding protocol 
-buffer definition (.proto) file, which are fetched from a network server,
-usually a Nexus registry.
+This project allows visualization of messages transferred in protobuf
+format.  This is a passive component that shows the messages
+explicitly delivered to it; it does not listen ("sniff") all network
+traffic searching for protobuf data.  Displaying the contents of a
+protobuf message requires the corresponding protocol buffer definition
+(.proto) file, which are fetched from a network server, usually a
+Nexus registry.
 
 Dependencies
 ============
 
-If you are running in Docker there are no external dependencies, for better or worse[1] it is
-totally self contained.
+If you are running in Docker there are no external dependencies, for
+better or worse[1] it is totally self contained.
 
 If you are running locally, please follow the quickstart guide below.
 
-[1] This Docker container runs Nginx, Redis, and Bokeh. The original requirements stated that
-the probe had to be a single Docker container.
+[1] This Docker container runs Nginx, Redis, and Bokeh. The original
+requirements stated that the probe had to be a single Docker
+container.
 
 Design
 ======
 
-The proto-viewer enables viewing of binary-encoded protocol buffer messages
-passed among elements of a composite solution by the runtime orchestrator
-component. To display message content the proto-viewer must parse the binary
-message using a protocol buffer message definition file. Those files are obtained
-dynamically by the proto-viewer from network sources.
+The proto-viewer enables viewing of binary-encoded protocol buffer
+messages passed among elements of a composite solution by the runtime
+orchestrator component. To display message content the proto-viewer
+must parse the binary message using a protocol buffer message
+definition file. Those files are obtained dynamically by the
+proto-viewer from network sources.
 
-Messages are passed to the proto-viewer by the Acumos blueprint orchestrator
-component, also known as the model connector.  The model connector makes HTTP POST
-calls to deliver a copy of each message to the proto-viewer along with some details
-about the message definition.
+Messages are passed to the proto-viewer by the Acumos blueprint
+orchestrator component, also known as the model connector.  The model
+connector makes HTTP POST calls to deliver a copy of each message to
+the proto-viewer along with some details about the message definition.
 
-Each message POST-ed to the proto-viewer must contain only binary Protocol-Buffer
-encoded content, and must include the following HTTP headers::
+Each message POST-ed to the proto-viewer must contain only binary
+Protocol-Buffer encoded content, and must include the following HTTP
+headers::
 
     PROTO-URL
     Message-Name
 
-The "PROTO-URL" parameter can be either a complete URL (e.g., "http://host:port/path/to/file")
-or just a suffix (e.g., "/path/to/file").  The URL is used to fetch the protocol
-buffer specification file for the message.  The "Message-Name" parameter specifies the
-name of the message (data structure) within that protocol buffer specification file,
-which may define multiple messages.
+The "PROTO-URL" parameter can be either a complete URL (e.g.,
+"http://host:port/path/to/file") or just a suffix (e.g.,
+"/path/to/file").  The URL is used to fetch the protocol buffer
+specification file for the message.  The "Message-Name" parameter
+specifies the name of the message (data structure) within that
+protocol buffer specification file, which may define multiple
+messages.
 
-If the PROTO-URL header parameter is just a suffix, the value of this environment
-variable is consulted::
+If the PROTO-URL header parameter is just a suffix, the value of this
+environment variable is consulted::
 
     NEXUSENDPOINTURL
 
-This is expected to contain the prefix of a URL where the protocol buffer file can be
-obtained; e.g., "http://host:port/context/path".
+This is expected to contain the prefix of a URL where the protocol
+buffer file can be obtained; e.g., "http://host:port/context/path".
 
-When the probe is sent the URL of a protocol buffer definition file, the probe
-downloads the .proto file. The file is also cached for reuse if the same URL is
-encountered again. One complication here is that the protoc tool fails for input
-files that contain a dot or hyphen in the filename, so the filenames are mangled
-by the proto-viewer to remove all offending characters. A second complication is
-that the proto file is only downloaded once and changes will not be discovered;
+When the probe is sent the URL of a protocol buffer definition file,
+the probe downloads the .proto file. The file is also cached for reuse
+if the same URL is encountered again. One complication here is that
+the protoc tool fails for input files that contain a dot or hyphen in
+the filename, so the filenames are mangled by the proto-viewer to
+remove all offending characters. A second complication is that the
+proto file is only downloaded once and changes will not be discovered;
 but this should never happen without the version number changing.
 
-The probe then invokes the "protoc" compiler on the definition file to generate a
-Python module, working in a temporary directory.  Finally the proto-viewer imports
-the newly created Python module and uses it to parse binary messages.
+The probe then invokes the "protoc" compiler on the definition file to
+generate a Python module, working in a temporary directory.  Finally
+the proto-viewer imports the newly created Python module and uses it
+to parse binary messages.
 
-The probe normally listens for requests on port 5006, which unfortunately cannot be
-changed due to flaws in the Bokeh library.  The probe also limits connections using
-a websocket filter.  To allow deployment in a Kubernetes environment where port 5006
-is not readily accessible,  the probe can be configured to accept incoming requests
-on any port by setting the environment variable ACUMOS_PROBE_EXTERNAL_PORT.
+The probe normally listens for requests on port 5006, which
+unfortunately cannot be changed due to flaws in the Bokeh library.
+The probe also limits connections using a websocket filter.  To allow
+deployment in a Kubernetes environment where port 5006 is not readily
+accessible, the probe can be configured to accept incoming requests on
+any port by setting the environment variable
+ACUMOS_PROBE_EXTERNAL_PORT.
 
 Data Retention
 ==============
 
-The current server side (probe) data retention policy is that the raw
+The proto-viewer uses two data stores. The first store is redis, for
+the storage of all raw incoming data.  The second store is the Bokeh
+data structure known as a "ColumnDataStore". Bokeh expects to serve
+the data from the CDS. However, the CDS has some constraints on it,
+for example it is JSON, so it does not support "bytes", which are what
+images are. So there is a conversion between the raw incoming data and
+what Bokeh expects.
+
+The current server-side data retention policy in redis is that the raw
 data cache resets every midnight. Meaning, if a user logs into the
-probe, they will see all data that came in since the prior midnight, and
-will see new data as it streams in. This is because the probe may be a
-long running process, and memory would increase without bound, so the
-probe has to have a TTL on data. If there is a need for a user to log in
-and see MORE data than the prior midnight, we can change this later by
-increasing the TTL to the last week or something.
+proto-viewer, they will see all data that came in since the prior
+midnight, and will see new data as it streams in. This is because the
+proto-viewer may be a long running process, and memory would increase
+without bound, so there has to be a TTL on data. If there is a need
+for a user to log in and see MORE data than the prior midnight, we can
+change this later by increasing the TTL to the last week or something.
 
 For the client side, Bokeh has a notion of a DataSource per session,
 which holds the data sent from the server to the browser, so we also
 have to limit the client side data, in case a user is logged in for a
-very long time. The “streaming limit” for numerical data is 100,000
+very long time. The "streaming limit" for numerical data is 100,000
 records, just over a day of data assuming one record per second. The
 streaming limit for images and raw data is just 1; the user sees it as
 it goes by, or it is lost (there is currently no replay).
+ 
+I thought the Bokeh stores can have their own timeouts, and for the
+image one, the code set it to 1. This can be seen as " stream_limit"
+in the bokeh run file.  However now that I'm looking at Bokeh's
+documentation, I don't actually see that parameter in their source
+code! So I'm not sure it works. It might just control how many items
+go into it at any given time.
+
+The function that uploads data from redis to Bokeh (which is doing the
+copying), depending on what the user is trying to look at, is a Bokeh
+callback implemented in the run.py script.
+ 
 
 Filesystem
 ==========
@@ -174,8 +204,9 @@ injected, by this server, with additional keys:
 Development Quickstart
 ======================
 
-The following steps set up a machine as a development and test environment without use of Docker,
-which is convenient for use on a typical desktop/laptop.
+The following steps set up a machine as a development and test
+environment without use of Docker, which is convenient for use on a
+typical desktop/laptop.
 
 #. Install prerequisites so they can be invoked by the probe:
 
@@ -188,9 +219,13 @@ which is convenient for use on a typical desktop/laptop.
 
     git clone https://gerrit.acumos.org/r/proto-viewer
 
-#. Download the redis server on the development machine from this site, then build::
+#. Download the redis server source from this site::
 
     https://redis.io/download
+
+#. Build the redis binary, which requires a C compiler and the make tool::
+
+    make
 
 #. Start the redis server on the development machine::
 
@@ -225,22 +260,26 @@ which is convenient for use on a typical desktop/laptop.
 
     http://localhost:5006
 
-Never ever change the port. It will not work. It will evolve to endless suffering. Darkness will envelop you. Essentially there's a bug in Bokeh.
+Never ever change the port. It will not work. It will evolve to
+endless suffering. Darkness will envelop you. Essentially there's a
+bug in Bokeh.
 
 
 Testing
 =======
 
-The proto-viewer can be tested standalone; i.e., without deploying a composite
-solution to any cloud environment.  Follow the development quickstart instructions
-above to install prerequisites and start the necessary servers.  Then use the 
-data-generation script described next.
+The proto-viewer can be tested standalone; i.e., without deploying a
+composite solution to any cloud environment.  Follow the development
+quickstart instructions above to install prerequisites and start the
+necessary servers.  Then use the data-generation script described
+next.
 
 Data Injector
 -------------
 
-A Python script is provided to generate and send data to the probe.  The name is
-"fake_data.py" and it can be found in the bin subdirectory.  Launch the script like this:
+A Python script is provided to generate and send data to the probe.
+The name is "fake_data.py" and it can be found in the bin
+subdirectory.  Launch the script like this:
 
 .. code:: bash
 
@@ -252,8 +291,9 @@ to send data to; it defaults to **localhost:5006** for local development.
 Test Messages
 -------------
 
-The test script creates and sends messages continually.  Those messages are cached within
-the running Redis server.  The following message types are used:
+The test script creates and sends messages continually.  Those
+messages are cached within the running Redis server.  The following
+message types are used:
 
 #. image-mood-classification-100.
    This message carries an array of objects including an image.
@@ -271,7 +311,8 @@ the running Redis server.  The following message types are used:
 Expected Behavior
 -----------------
 
-Use a web browser to visit the proto-viewer with the appropriate host and port, the default URL is the following::
+Use a web browser to visit the proto-viewer with the appropriate host
+and port, the default URL is the following::
 
     http://localhost:5006
     
@@ -279,8 +320,8 @@ Upon browsing to this URL a page like the following should load:
 
  |img-probe-start|
 
-After the data-injection script has sent a few data points, follow these steps to view a plot of data
-that arrives in a nested message:
+After the data-injection script has sent a few data points, follow
+these steps to view a plot of data that arrives in a nested message:
 
 #. In the Model Selection drop-down, pick item "protobuf_probe_testnested_100proto"
 #. In the Message Selection drop-down, pick item "NestOuter"
