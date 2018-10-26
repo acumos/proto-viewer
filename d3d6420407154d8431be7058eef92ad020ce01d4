@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebbbac27_89e7ee7f",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-26T22:04:47Z",
+      "side": 1,
+      "message": "Nice first person comment - just like TV characters talking directly to the audience",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 44
+      },
+      "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
