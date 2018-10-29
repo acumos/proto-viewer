@@ -96,6 +96,24 @@
       "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ca7aa9c3_637e2e9e",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-29T16:13:33Z",
+      "side": 1,
+      "message": "Perhaps you overlooked the note at the top of the Quickstart section: \".. a development and test environment without use of Docker.\"",
+      "parentUuid": "1e610579_3f56b0bc",
+      "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
