@@ -2,6 +2,63 @@
   "comments": [
     {
       "key": {
+        "uuid": "ed11a61d_448979e1",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-10-29T15:30:57Z",
+      "side": 1,
+      "message": "this isn\u0027t a complete sentence. I would say \"redis, for the storage of all raw incoming data, and...\"",
+      "range": {
+        "startLine": 96,
+        "startChar": 47,
+        "endLine": 96,
+        "endChar": 51
+      },
+      "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bb71a7d1_140728e2",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-10-29T15:30:57Z",
+      "side": 1,
+      "message": "remove \"actually\"",
+      "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a536e90_34ebfd23",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-10-29T15:30:57Z",
+      "side": 1,
+      "message": "I think this should be moved up near the discussion of streaming limit above, maybe as a parenthetical comment. It\u0027s weird here disjointed.",
+      "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ebbbac27_89e7ee7f",
         "filename": "docs/developer-guide.rst",
         "patchSetId": 1
@@ -19,6 +76,23 @@
         "endLine": 127,
         "endChar": 44
       },
+      "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e610579_3f56b0bc",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-10-29T15:30:57Z",
+      "side": 1,
+      "message": "I have never once build a redis binary. I have always ran it in Docker for all projects I have ever used with it. So I would really lead with the dockerized approach for development.\n\nI would AT LEAST offer the Docker route as an alternative to this redneck way.",
       "revId": "d3d6420407154d8431be7058eef92ad020ce01d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
