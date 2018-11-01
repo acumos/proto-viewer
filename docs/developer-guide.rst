@@ -100,18 +100,24 @@ accessible, the probe can be configured to accept incoming requests on
 any port by setting the environment variable
 ACUMOS_PROBE_EXTERNAL_PORT.
 
-Data Retention
-==============
+Data Stores and Retention
+=========================
 
-The proto-viewer uses two data stores. The first store is redis, for
-the storage of all raw incoming data.  The second store is the Bokeh
-data structure known as a "ColumnDataStore". Bokeh expects to serve
-the data from the CDS. However, the CDS has some constraints on it,
-for example it is JSON, so it does not support "bytes", which are what
-images are. So there is a conversion between the raw incoming data and
-what Bokeh expects.
+The proto-viewer stores incoming data feeds (one feed per model and
+message) so that it can produce visualizations such as time series.
 
-The current server-side data retention policy in redis is that the raw
+The feed content is maintained in two data stores. The first store is
+Redis, which holds every raw incoming message, subject to retention as
+discussed below.  The second store is a Bokeh data structure known as
+a "Column Data Store", which holds the message data selected by a user
+in a Bokeh session.  Bokeh expects to serve its data from its column
+data store. However, that store has some constraints on it; for
+example it is JSON, so it does not support "bytes", which are what
+images are. So when message data is fetched from the Redis store for
+use by Bokeh, a conversion is performed to produce the format that
+Bokeh expects.
+
+The current server-side data retention policy in Redis is that the raw
 data cache resets every midnight. Meaning, if a user logs into the
 proto-viewer, they will see all data that came in since the prior
 midnight, and will see new data as it streams in. This is because the
@@ -120,10 +126,10 @@ without bound, so there has to be a TTL on data. If there is a need
 for a user to log in and see MORE data than the prior midnight, we can
 change this later by increasing the TTL to the last week or something.
 
-For the client side, Bokeh has a notion of a DataSource per session,
-which holds the data sent from the server to the browser, so we also
-have to limit the client side data, in case a user is logged in for a
-very long time. The "streaming limit" for numerical data is 100,000
+For the client side, Bokeh has a notion of a column data source per
+session, which holds the data sent from the server to the browser, so we
+also have to limit the client side data, in case a user is logged in for
+a very long time. The "streaming limit" for numerical data is 100,000
 records, just over a day of data assuming one record per second. The
 streaming limit for images and raw data is just 1; the user sees it as
 it goes by, or it is lost (there is currently no replay).
@@ -135,10 +141,17 @@ documentation, I don't actually see that parameter in their source
 code! So I'm not sure it works. It might just control how many items
 go into it at any given time.
 
-The function that uploads data from redis to Bokeh (which is doing the
+The function that uploads data from Redis to Bokeh (which is doing the
 copying), depending on what the user is trying to look at, is a Bokeh
 callback implemented in the run.py script.
  
+To reduce Redis memory usage consider the following options:
+
+#. Reduce the historic time window of data; i.e., drop all data much sooner.
+#. Send fewer feeds. If you want a more "microservice-ey" architecture, you could launch more probes, send them each a fraction of the feeds, and each will use less total data
+#. Send the same number of feeds but at a reduced rate
+#. Send smaller data in each feed. If you are sending the probe images, and each one is a few hundred KB or MB, that is going to pile up quickly. 
+
 
 Filesystem
 ==========
@@ -219,15 +232,15 @@ typical desktop/laptop.
 
     git clone https://gerrit.acumos.org/r/proto-viewer
 
-#. Download the redis server source from this site::
+#. Download the Redis server source from this site::
 
     https://redis.io/download
 
-#. Build the redis binary, which requires a C compiler and the make tool::
+#. Build the Redis binary, which requires a C compiler and the make tool::
 
     make
 
-#. Start the redis server on the development machine::
+#. Start the Redis server on the development machine::
 
     src/redis-server
 
