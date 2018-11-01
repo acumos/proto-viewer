@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17bc6593_a745e3e2",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-11-01T19:07:51Z",
+      "side": 1,
+      "message": "typo (Boken)",
+      "revId": "8e32403da3de700cabce3d634c1606752a3430d7",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e1469547_8294d4ec",
+        "filename": "docs/developer-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 123
+      },
+      "writtenOn": "2018-11-01T19:07:51Z",
+      "side": 1,
+      "message": "it could be multiple CDS per session if the same user keeps switching graph types, or message types, I think.",
+      "revId": "8e32403da3de700cabce3d634c1606752a3430d7",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
