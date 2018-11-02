@@ -25,6 +25,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__
 and this project adheres to `Semantic Versioning <http://semver.org/>`__.
 
+[1.6.0] - 11/9/2018
+-------------------
+
+- Update to python3.7
+- Make requirements.txt much less specific
+- Remove outdated information in dev guide
+
 [1.5.7] - 10/18/2018
 --------------------
 
