@@ -134,7 +134,7 @@ numerical data is 100,000 records, just over a day of data assuming
 one record per second. The streaming limit for images and raw data is
 just 1; the user sees it as it goes by, or it is lost (there is
 currently no replay).
- 
+
 I thought the Bokeh stores can have their own timeouts, and for the
 image one, the code set it to 1. This can be seen as " stream_limit"
 in the bokeh run file.  However now that I'm looking at Bokeh's
@@ -145,13 +145,13 @@ go into it at any given time.
 The function that uploads data from Redis to Bokeh (which is doing the
 copying), depending on what the user is trying to look at, is a Bokeh
 callback implemented in the run.py script.
- 
+
 To reduce Redis memory usage consider the following options:
 
 #. Reduce the historic time window of data; i.e., drop all data much sooner.
 #. Send fewer feeds. If you want a more "microservice-ey" architecture, you could launch more probes, send them each a fraction of the feeds, and each will use less total data
 #. Send the same number of feeds but at a reduced rate
-#. Send smaller data in each feed. If you are sending the probe images, and each one is a few hundred KB or MB, that is going to pile up quickly. 
+#. Send smaller data in each feed. If you are sending the probe images, and each one is a few hundred KB or MB, that is going to pile up quickly.
 
 
 Filesystem
@@ -225,7 +225,7 @@ typical desktop/laptop.
 #. Install prerequisites so they can be invoked by the probe:
 
     a. Python version 3.6+, ideally in a virtual environment
-    b. The protocol buffer compiler ("protoc"), version 3.4 or later
+    b. The protocol buffer compiler ("protoc"), version 3.5.1 (note: 3.6.1 does not appear to work, requires investigation)
     c. The `npm` tool, version 2.15.5 or later
     d. The `npm` package `protobuf-jsonschema`, version 1.1.1 or later (`npm install protobuf-jsonschema`)
 
@@ -249,14 +249,18 @@ typical desktop/laptop.
 
     virtualenv -p python3.6 apv36
 
+#. Activate the virtualenv::
+
+    source bin/activate
+
 #. Use the newly created virtual environment to install the proto-viewer (i.e., this) python package::
 
-    ./apv36/bin/pip install -r requirements.txt
-    ./apv36/bin/pip install .
+    pip install -r requirements.txt
+    pip install .
 
 #. Start a Python HTTP server to publish the protocol buffer definition files. It uses port 8000 by default::
 
-    cd tests/fixtures; ../../apv36/bin/python3 -m http.server
+    cd tests/fixtures; python -m http.server
 
 #. Set an environment variable with the appropriate URL of the Python HTTP server::
 
@@ -264,11 +268,11 @@ typical desktop/laptop.
 
 #. Launch the Bokeh-enabled web server that is the proto-viewer::
 
-    ./apv36/bin/python3 bin/run.py
+    ./bin/run.py
 
 #. Start the data-injection script::
 
-    ./apv36/bin/python3 fake_data.py
+    ./bin/fake_data.py
 
 #. Open a web browser::
 
@@ -329,7 +333,7 @@ Use a web browser to visit the proto-viewer with the appropriate host
 and port, the default URL is the following::
 
     http://localhost:5006
-    
+
 Upon browsing to this URL a page like the following should load:
 
  |img-probe-start|
