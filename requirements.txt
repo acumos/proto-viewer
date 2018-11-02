@@ -1,5 +1,1 @@
-tornado==4.5.3
 protobuf==3.5.0.post1
-requests==2.18.4
-bokeh==0.12.13
-redis==2.10.6

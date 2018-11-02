@@ -36,7 +36,7 @@ better or worse[1] it is totally self contained.
 
 If you are running locally, please follow the quickstart guide below.
 
-[1] This Docker container runs Nginx, Redis, and Bokeh. The original
+[1] This Docker container runs Redis and Bokeh. The original
 requirements stated that the probe had to be a single Docker
 container.
 
@@ -171,8 +171,8 @@ a Docker registry server listens.
 
 .. code:: bash
 
-    docker build -t my.registry.com:12345/acumos_proto_viewer:1.0.0 .
-    docker push     my.registry.com:12345/acumos_proto_viewer:1.0.0
+    docker build -t my.registry.com:12345/acumos_proto_viewer:X.Y.Z .
+    docker push     my.registry.com:12345/acumos_proto_viewer:X.Y.Z
 
 Run
 ===
@@ -181,7 +181,7 @@ Follow these instructions to launch the Docker image with the proto-viewer.
 
 .. code:: bash
 
-    docker run -dit -p 80:80 my.registry.com:12345/acumos_proto_viewer:1.0.0
+    docker run -dt -p 5006:5006 -e NEXUSENDPOINTURL=xxxx  my.registry.com:12345/acumos_proto_viewer:X.Y.Z
 
 
 Required environment variables
