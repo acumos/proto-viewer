@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9da74574_c4de9656",
+        "filename": "setup.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-09T19:41:47Z",
+      "side": 1,
+      "message": "Can you list versions here? The old requirements.txt had versions, but now those lines are gone, and this has no versions.  Dangerous to let pip or whatever choose freely.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 35
+      },
+      "revId": "70d377814184f341320d77a54545e36d3da008da",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e4ef1fac_9c3c935c",
+        "filename": "tox.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-09T19:41:47Z",
+      "side": 1,
+      "message": "Why test with 3.6 if you\u0027re starting with 3.7?",
+      "range": {
+        "startLine": 2,
+        "startChar": 10,
+        "endLine": 2,
+        "endChar": 14
+      },
+      "revId": "70d377814184f341320d77a54545e36d3da008da",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
