@@ -13,7 +13,7 @@ setup(
     zip_safe=False,
     install_requires=["requests >2.0.0, <3.0.0",
                       "jsonschema >2.0.0, <3.0.0",
-                      "tornado >5.0.0, <3.0.0",
+                      "tornado >3.0.0, <5.0.0",
                       "bokeh >1.0.0, <3.0.0",
                       "redis >2.0.0, <3.0.0"],
     scripts=[
