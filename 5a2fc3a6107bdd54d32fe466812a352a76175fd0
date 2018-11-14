@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e214cbb_92d3fad2",
+        "filename": "setup.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 223
+      },
+      "writtenOn": "2018-11-14T22:02:59Z",
+      "side": 1,
+      "message": "The order of these is backwards (you\u0027re requiring that it\u0027s greater than 5 and less than 3).",
+      "range": {
+        "startLine": 16,
+        "startChar": 31,
+        "endLine": 16,
+        "endChar": 46
+      },
+      "revId": "5a2fc3a6107bdd54d32fe466812a352a76175fd0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
