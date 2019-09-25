@@ -2,12 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!-- This file publishes Docker name and tag for the LF Jenkins build script -->
+    <!-- properties for Sonar only -->
     <groupId>org.acumos.proto-viewer</groupId>
-    <!-- docker image name -->
     <artifactId>acumos-proto-viewer</artifactId>
-    <!-- docker tag -->
-    <version>1.6.0</version> <!-- REPEATED IN setup.py MUST MATCH -->
+    <version>0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.sources>.</sonar.sources>

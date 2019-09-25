@@ -19,9 +19,7 @@ RUN mv protoc3/include/* /usr/local/include/
 CMD protoc --version
 
 ### INSTALL NPM, protobuf-jsonschema
-# Stolen from https://www.rosehosting.com/blog/install-npm-on-ubuntu-16-04/
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
-RUN apt-get install -y nodejs
+RUN apt-get install -y npm nodejs
 RUN npm -v
 RUN npm install protobuf-jsonschema -g
 
