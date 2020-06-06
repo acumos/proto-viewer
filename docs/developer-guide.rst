@@ -231,7 +231,7 @@ typical desktop/laptop.
 
 #. Clone the proto-viewer repository (which you may already have done, since you're reading this)::
 
-    git clone https://gerrit.acumos.org/r/proto-viewer
+    git clone --depth 1 https://gerrit.acumos.org/r/proto-viewer
 
 #. Download the Redis server source from this site::
 
