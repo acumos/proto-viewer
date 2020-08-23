@@ -41,12 +41,12 @@ RUN \
   sed -i 's/^\(logfile .*\)$/# \1/' /etc/redis/redis.conf
 
 #need pip > 8 to have internal pypi repo in requirements.txt
-RUN pip install --upgrade pip 
+RUN pip install --no-cache-dir --upgrade pip 
 
 ##### INSTALL THIS APP
 WORKDIR /tmp
-RUN pip install -r requirements.txt
-RUN pip install .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir .
 
 EXPOSE 5006
 
