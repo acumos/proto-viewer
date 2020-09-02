@@ -1,4 +1,5 @@
 # UUID                                                                                	Group Name
 #
 42f0c83244389e408b42fa668348002012ecba46                                              	GitHub Replication
+7da289e43c80a70b5c41ee8de8af9ec1b9044c9f                                              	saml/acumos-gerrit-acumos-proto-viewer-committers
 ldap:cn=acumos-gerrit-acumos-proto-viewer-committers,ou=Groups,dc=freestandards,dc=org	ldap/acumos-gerrit-acumos-proto-viewer-committers
